@@ -1,0 +1,25 @@
+{
+	"extends": "@vue/tsconfig/tsconfig.dom.json",
+	"compilerOptions": {
+		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+		"types": ["vite/client"],
+
+		/* ✅ Add this line to silence the warning */
+		"ignoreDeprecations": "6.0",
+
+		/* Linting */
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"erasableSyntaxOnly": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedSideEffectImports": true,
+
+		/* Aliases */
+		"baseUrl": ".",
+		"paths": {
+			"@/*": ["./src/*"]
+		}
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+}

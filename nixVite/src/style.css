@@ -1,0 +1,76 @@
+@import 'tailwindcss';
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+	name: 'technova';
+	default: true;
+	prefersdark: true; /* Включаем темную тему по умолчанию */
+	color-scheme: dark;
+
+	/* --- BACKGROUNDS (Base) --- */
+	/* Основной фон (#171a21) - Очень темный серо-синий */
+	--color-base-100: oklch(13% 0.035 255);
+	/* Фон панелей/карточек (#1b2838) - Чуть светлее и синее */
+	--color-base-200: oklch(18% 0.045 255);
+	/* Фон инпутов/ховеров (#2a475e / #101215 mix) */
+	--color-base-300: oklch(25% 0.055 255);
+	/* Основной текст (#c7d5e0) - Светло-серо-голубой */
+	--color-base-content: oklch(85% 0.03 255);
+
+	/* --- PRIMARY ACCENT (#66c0f4) --- */
+	/* Яркий голубой Steam */
+	--color-primary: oklch(75% 0.15 230);
+	/* Текст на кнопке primary (должен быть темным для контраста) */
+	--color-primary-content: oklch(15% 0.05 255);
+
+	/* --- SECONDARY (#2D73FF) --- */
+	/* Более насыщенный синий для градиентов и вторичных кнопок */
+	--color-secondary: oklch(60% 0.2 260);
+	--color-secondary-content: oklch(98% 0.01 260);
+
+	/* --- ACCENT (Decorative) --- */
+	/* Используем для бейджей или активных элементов меню */
+	--color-accent: oklch(70% 0.18 200);
+	--color-accent-content: oklch(15% 0.05 200);
+
+	/* --- NEUTRAL --- */
+	/* Темно-серый для футера или бордеров */
+	--color-neutral: oklch(20% 0.04 255);
+	--color-neutral-content: oklch(80% 0.03 255);
+
+	/* --- STATES --- */
+
+	/* Info (Синий, для уведомлений) */
+	--color-info: oklch(70% 0.15 230);
+	--color-info-content: oklch(15% 0.05 230);
+
+	/* Success (#a1cd44) - Зеленый ценник/статус */
+	--color-success: oklch(78% 0.2 145);
+	--color-success-content: oklch(20% 0.05 145);
+
+	/* Warning (#ffcc00) - Желтый статус */
+	--color-warning: oklch(85% 0.2 90);
+	--color-warning-content: oklch(20% 0.05 90);
+
+	/* Error (#ff4d4d) - Красный для ошибок */
+	--color-error: oklch(65% 0.25 25);
+	--color-error-content: oklch(98% 0.01 25);
+
+	/* --- SETTINGS --- */
+
+	/* Border Radius */
+	--radius-selector: 0.5rem; /* Кнопки и инпуты чуть скруглены (4-8px) */
+	--radius-field: 0.25rem; /* Поля ввода более квадратные */
+	--radius-box: 0.5rem; /* Карточки */
+
+	/* Sizes */
+	--size-selector: 0.25rem;
+	--size-field: 0.25rem;
+
+	/* Border */
+	--border: 1px;
+
+	/* Effects */
+	--depth: 1; /* Тени */
+	--noise: 0; /* Без шума */
+}
