@@ -733,6 +733,16 @@ const server = http.createServer(async (req, res) => {
 
 await ensurePluginsDir();
 
+server.on("error", (err) => {
+  if (err.code === "EADDRINUSE") {
+    console.log(`\x1b[33m[Plugins Server] Порт ${PORT} уже занят. Сервер плагинов уже работает в фоне.\x1b[0m`);
+    process.exit(0);
+  } else {
+    console.error("[Plugins Server] Ошибка сервера:", err);
+    process.exit(1);
+  }
+});
+
 server.listen(PORT, "0.0.0.0", () => {
   console.log("\x1b[35m%s\x1b[0m", "==================================================");
   console.log("\x1b[35m%s\x1b[0m", `🧩 SNAPI PLUGINS & MARKETPLACE SERVER RUNNING!`);
