@@ -1,16 +1,9 @@
 // src/services/plugins/PluginRuntime.ts
 
-export interface PluginContext {
-  pluginId: string
-  name: string
-  version: string
-  showNotification: (title: string, body: string) => void
-  setThemeVariables: (vars: Record<string, string>) => void
-  addStyle: (cssText: string) => void
-  removeStyle: () => void
-  on: (event: string, handler: (...args: any[]) => void) => void
-  emit: (event: string, ...args: any[]) => void
-}
+import { createPluginAPI } from './sdk/createPluginAPI'
+import type { SnapiPluginAPI } from './sdk/types'
+
+export type PluginContext = SnapiPluginAPI
 
 export interface InstalledPlugin {
   id: string
@@ -116,46 +109,14 @@ class PluginRuntimeManager {
   }
 
   /**
-   * Создать контекст API для плагина
+   * Создать контекст API для плагина (Безопасный SDK)
    */
   createContext(plugin: InstalledPlugin): PluginContext {
-    return {
-      pluginId: plugin.id,
-      name: plugin.name,
-      version: plugin.version,
-      showNotification: (title: string, body: string) => {
-        console.log(`%c[Plugin: ${plugin.name}] %c${title}: ${body}`, 'color: #38bdf8; font-weight: bold;', 'color: white;')
-        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-          try { new Notification(title, { body }) } catch {}
-        }
-      },
-      setThemeVariables: (vars: Record<string, string>) => {
-        for (const [key, val] of Object.entries(vars)) {
-          const varName = key.startsWith('--') ? key : `--${key}`
-          document.documentElement.style.setProperty(varName, val, 'important')
-        }
-      },
-      addStyle: (cssText: string) => {
-        this.applyStyles(plugin.id, cssText)
-      },
-      removeStyle: () => {
-        this.removeStyles(plugin.id)
-      },
-      on: (event: string, handler: (...args: any[]) => void) => {
-        if (!this.eventListeners.has(event)) {
-          this.eventListeners.set(event, new Set())
-        }
-        this.eventListeners.get(event)!.add(handler)
-      },
-      emit: (event: string, ...args: any[]) => {
-        const listeners = this.eventListeners.get(event)
-        if (listeners) {
-          for (const l of listeners) {
-            try { l(...args) } catch (err) { console.error(`[Plugin Event Error]`, err) }
-          }
-        }
-      }
-    }
+    return createPluginAPI(plugin, {
+      applyStyles: (id, s) => this.applyStyles(id, s),
+      removeStyles: (id) => this.removeStyles(id),
+      eventListeners: this.eventListeners
+    })
   }
 
   /**
