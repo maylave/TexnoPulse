@@ -58,11 +58,4 @@ export interface SnapiPluginAPI {
   ui: SnapiUiAPI
   theme: SnapiThemeAPI
   events: SnapiEventsAPI
-  // Обратная совместимость для существующих плагинов
-  showNotification: (title: string, body: string) => void
-  setThemeVariables: (vars: Record<string, string>) => void
-  addStyle: (cssText: string) => void
-  removeStyle: () => void
-  on: (event: string, handler: (...args: any[]) => void) => void
-  emit: (event: string, ...args: any[]) => void
 }

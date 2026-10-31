@@ -198,13 +198,6 @@ export function createPluginAPI(
     messages,
     ui,
     theme,
-    events,
-    // Обратная совместимость:
-    showNotification: ui.showNotification,
-    setThemeVariables: theme.setTokens,
-    addStyle: (cssText: string) => runtime.applyStyles(plugin.id, cssText),
-    removeStyle: () => runtime.removeStyles(plugin.id),
-    on: events.on,
-    emit: events.emit
+    events
   }
 }
