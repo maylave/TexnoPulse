@@ -60,15 +60,7 @@ watch(searchQuery, (newValue) => {
       />
 
       <!-- Бейдж глобального поиска Ctrl+K -->
-      <button
-        v-if="!searchQuery"
-        type="button"
-        @click="modalStore.open('global-search')"
-        class="pr-3 text-[10px] font-mono text-[var(--header-icon)] hover:text-white transition-colors cursor-pointer"
-        title="Глобальный поиск (⌘K / Ctrl+K)"
-      >
-        ⌘K
-      </button>
+      
 
       <!-- Кнопка очистки (появляется, если есть текст) -->
       <button

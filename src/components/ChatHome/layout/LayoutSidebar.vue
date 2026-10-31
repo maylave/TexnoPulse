@@ -30,13 +30,7 @@ const searchQuery = ref("");
         </div>
 
         <!-- Кнопка перехода в маркетплейс плагинов и тем -->
-        <button 
-          @click="router.push('/plugin')"
-          class="shrink-0 p-2 flex items-center justify-center rounded-full text-[var(--color-on-surface-variant)] hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
-          title="Каталог плагинов и тем"
-        >
-          <Puzzle class="w-4 h-4 text-sky-400" />
-        </button>
+       
         
         <!-- Кнопка открытия настроек -->
         <button 
