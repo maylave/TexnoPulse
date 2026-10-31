@@ -1,0 +1,12 @@
+{
+  "name": "snapi-plugins-server",
+  "version": "1.0.0",
+  "description": "Dedicated standalone marketplace and plugins server for Snapi",
+  "main": "src/index.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.mjs",
+    "dev": "node --watch src/index.mjs"
+  },
+  "dependencies": {}
+}

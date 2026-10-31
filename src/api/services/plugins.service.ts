@@ -1,4 +1,4 @@
-import { httpClient } from './http.client'
+import { pluginsHttpClient, httpClient } from './http.client'
 
 export interface ServerPluginManifest {
   id: string
@@ -16,15 +16,36 @@ export interface ServerPluginManifest {
   createdAt?: string
 }
 
+async function requestWithFallback<T>(url: string, method: 'get' | 'post' | 'delete' = 'get', data?: any) {
+  try {
+    // 1. Сначала обращаемся к выделенному серверу плагинов (порт 4000 или удаленный)
+    if (method === 'post') {
+      return await pluginsHttpClient.post<T>(url, data, { timeout: 2500 })
+    } else if (method === 'delete') {
+      return await pluginsHttpClient.delete<T>(url, { timeout: 2500 })
+    }
+    return await pluginsHttpClient.get<T>(url, { timeout: 2500 })
+  } catch (err: any) {
+    // 2. Fallback: если отдельный сервер плагинов выключен, проверяем основной локальный бэкенд (порт 3000)
+    console.warn(`[Plugins Service] Запрос к серверу плагинов не удался, пробуем резервный локальный бэкенд...`)
+    if (method === 'post') {
+      return await httpClient.post<T>(url, data)
+    } else if (method === 'delete') {
+      return await httpClient.delete<T>(url)
+    }
+    return await httpClient.get<T>(url)
+  }
+}
+
 export const pluginsService = {
   // 1. Получить список всех плагинов с сервера
-  getAll: () => httpClient.get<{ data: ServerPluginManifest[]; count: number }>('/plugins'),
+  getAll: () => requestWithFallback<{ data: ServerPluginManifest[]; count: number }>('/plugins'),
 
   // 2. Получить плагин по ID
-  getById: (id: string) => httpClient.get<ServerPluginManifest>(`/plugins/${id}`),
+  getById: (id: string) => requestWithFallback<ServerPluginManifest>(`/plugins/${id}`),
 
   // 3. Скачать плагин по ID (возвращает манифест, бандл кода и стили)
-  download: (id: string) => httpClient.get<{
+  download: (id: string) => requestWithFallback<{
     manifest: ServerPluginManifest
     code: string
     styles: string
@@ -33,8 +54,8 @@ export const pluginsService = {
 
   // 4. Опубликовать сторонний плагин на сервер
   upload: (pluginData: Partial<ServerPluginManifest>) =>
-    httpClient.post<{ success: boolean; plugin: ServerPluginManifest }>('/plugins/upload', pluginData),
+    requestWithFallback<{ success: boolean; plugin: ServerPluginManifest }>('/plugins/upload', 'post', pluginData),
 
   // 5. Удалить плагин с сервера
-  delete: (id: string) => httpClient.delete(`/plugins/${id}`)
+  delete: (id: string) => requestWithFallback<{ success: boolean; message: string }>(`/plugins/${id}`, 'delete')
 }
