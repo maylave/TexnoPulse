@@ -110,24 +110,382 @@ export const DEFAULT_STARTER_PLUGINS: ServerPluginManifest[] = [
     `
   },
   {
-    id: 'quick-notes',
-    name: 'Quick Notes & Scratchpad',
-    version: '1.0.2',
-    desc: 'Встроенный блокнот для быстрых заметок, сниппетов кода и черновиков прямо внутри мессенджера.',
-    author: 'DevAlex',
-    icon: 'FileText',
+    id: 'pomodoro-timer',
+    name: 'Pomodoro Focus Timer',
+    version: '1.2.0',
+    desc: 'Интерактивный плавающий таймер продуктивности с режимами фокуса (25 мин), отдыха (5 мин), звуковым сигналом и системными уведомлениями.',
+    author: 'FocusLab',
+    icon: 'Timer',
     categoryId: 'utils',
-    downloads: 315,
-    rating: 4.9,
+    downloads: 412,
+    rating: 4.98,
     hasTheme: false,
-    styles: '',
+    styles: `
+      .snapi-pomodoro-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 999999;
+        font-family: inherit;
+        user-select: none;
+      }
+      .snapi-pomodoro-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 9999px;
+        background: rgba(11, 17, 32, 0.9);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(0, 242, 254, 0.35);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 242, 254, 0.25);
+        color: #fff;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .snapi-pomodoro-badge:hover {
+        transform: translateY(-2px) scale(1.04);
+        border-color: rgba(0, 242, 254, 0.6);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 22px rgba(0, 242, 254, 0.4);
+      }
+      .snapi-pomodoro-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 270px;
+        padding: 18px;
+        border-radius: 22px;
+        background: rgba(11, 17, 32, 0.94);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 242, 254, 0.15);
+        color: #fff;
+        animation: snapiPomoFadeIn 0.25s ease-out;
+      }
+      @keyframes snapiPomoFadeIn {
+        from { opacity: 0; transform: translateY(12px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+    `,
     code: `
       export default {
         install(context) {
-          console.log('[Plugin: Quick Notes] Инициализирован');
+          console.log('[Pomodoro Plugin] Инициализирован');
+          context.showNotification('Pomodoro Timer', 'Таймер фокуса готов к работе!');
+
+          let duration = 25 * 60;
+          let remaining = duration;
+          let timerId = null;
+          let isRunning = false;
+          let isCollapsed = false;
+          let currentMode = 'focus';
+
+          const container = document.createElement('div');
+          container.id = 'snapi-plugin-pomodoro';
+          container.className = 'snapi-pomodoro-container';
+
+          function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = (sec % 60).toString().padStart(2, '0');
+            return m + ':' + s;
+          }
+
+          function playChime() {
+            try {
+              const AudioCtx = window.AudioContext || window.webkitAudioContext;
+              if (!AudioCtx) return;
+              const ctx = new AudioCtx();
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+              osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
+              gain.gain.setValueAtTime(0.3, ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+              osc.start();
+              osc.stop(ctx.currentTime + 0.8);
+            } catch (e) {}
+          }
+
+          function render() {
+            if (isCollapsed) {
+              container.innerHTML = '<div id=\"snapi-pomo-badge\" class=\"snapi-pomodoro-badge\">' +
+                '<span style=\"font-size: 16px;\">' + (currentMode === 'focus' ? '🍅' : '☕') + '</span>' +
+                '<span>' + formatTime(remaining) + '</span>' +
+                '<span style=\"font-size: 11px; opacity: 0.7;\">' + (isRunning ? '▶' : '⏸') + '</span>' +
+              '</div>';
+              const badge = container.querySelector('#snapi-pomo-badge');
+              badge && badge.addEventListener('click', () => {
+                isCollapsed = false;
+                render();
+              });
+              return;
+            }
+
+            const progress = ((duration - remaining) / duration) * 100;
+            const themeColor = currentMode === 'focus' ? '#00f2fe' : (currentMode === 'shortBreak' ? '#10b981' : '#a855f7');
+
+            container.innerHTML = '<div class=\"snapi-pomodoro-panel\">' +
+              '<div style=\"display: flex; justify-content: space-between; align-items: center;\">' +
+                '<div style=\"display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px;\">' +
+                  '<span>🍅</span>' +
+                  '<span>Pomodoro Фокус</span>' +
+                '</div>' +
+                '<button id=\"snapi-pomo-minimize\" style=\"background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 2px 6px; border-radius: 6px; font-size: 14px;\" title=\"Свернуть\">_</button>' +
+              '</div>' +
+
+              '<div style=\"display: flex; gap: 4px; background: rgba(255,255,255,0.06); padding: 3px; border-radius: 12px;\">' +
+                '<button class=\"snapi-pomo-mode\" data-mode=\"focus\" style=\"flex: 1; padding: 5px; font-size: 10px; font-weight: 600; border-radius: 9px; border: none; cursor: pointer; transition: all 0.2s; ' + (currentMode === 'focus' ? 'background: #00f2fe; color: #020617;' : 'background: transparent; color: #94a3b8;') + '\">Фокус 25м</button>' +
+                '<button class=\"snapi-pomo-mode\" data-mode=\"shortBreak\" style=\"flex: 1; padding: 5px; font-size: 10px; font-weight: 600; border-radius: 9px; border: none; cursor: pointer; transition: all 0.2s; ' + (currentMode === 'shortBreak' ? 'background: #10b981; color: #020617;' : 'background: transparent; color: #94a3b8;') + '\">Отдых 5м</button>' +
+                '<button class=\"snapi-pomo-mode\" data-mode=\"longBreak\" style=\"flex: 1; padding: 5px; font-size: 10px; font-weight: 600; border-radius: 9px; border: none; cursor: pointer; transition: all 0.2s; ' + (currentMode === 'longBreak' ? 'background: #a855f7; color: #ffffff;' : 'background: transparent; color: #94a3b8;') + '\">Пауза 15м</button>' +
+              '</div>' +
+
+              '<div style=\"text-align: center; padding: 8px 0;\">' +
+                '<div style=\"font-size: 38px; font-weight: 800; letter-spacing: -1px; font-family: monospace; color: ' + themeColor + '; text-shadow: 0 0 20px ' + themeColor + '40;\">' +
+                  formatTime(remaining) +
+                '</div>' +
+                '<div style=\"font-size: 11px; color: #94a3b8; margin-top: 2px;\">' +
+                  (currentMode === 'focus' ? 'Концентрация на задачах' : 'Время перевести дух') +
+                '</div>' +
+              '</div>' +
+
+              '<div style=\"width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 999px; overflow: hidden;\">' +
+                '<div style=\"width: ' + progress + '%; height: 100%; background: ' + themeColor + '; transition: width 0.3s;\"></div>' +
+              '</div>' +
+
+              '<div style=\"display: flex; gap: 8px; margin-top: 4px;\">' +
+                '<button id=\"snapi-pomo-toggle\" style=\"flex: 1; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: ' + (isRunning ? 'rgba(239, 68, 68, 0.2)' : themeColor) + '; color: ' + (isRunning ? '#f87171' : '#020617') + '; border: ' + (isRunning ? '1px solid rgba(239, 68, 68, 0.4)' : 'none') + '; box-shadow: ' + (isRunning ? 'none' : '0 4px 15px ' + themeColor + '40') + '; transition: all 0.2s;\">' +
+                  (isRunning ? 'Пауза ⏸' : 'Старт ▶') +
+                '</button>' +
+                '<button id=\"snapi-pomo-reset\" style=\"padding: 8px 12px; border-radius: 12px; font-size: 12px; cursor: pointer; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; transition: all 0.2s;\" title=\"Сбросить время\">' +
+                  '↺' +
+                '</button>' +
+              '</div>' +
+            '</div>';
+
+            container.querySelector('#snapi-pomo-minimize')?.addEventListener('click', () => {
+              isCollapsed = true;
+              render();
+            });
+
+            container.querySelectorAll('.snapi-pomo-mode').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                const mode = e.currentTarget.getAttribute('data-mode');
+                currentMode = mode;
+                if (mode === 'focus') duration = 25 * 60;
+                else if (mode === 'shortBreak') duration = 5 * 60;
+                else if (mode === 'longBreak') duration = 15 * 60;
+                remaining = duration;
+                if (timerId) { clearInterval(timerId); timerId = null; isRunning = false; }
+                render();
+              });
+            });
+
+            container.querySelector('#snapi-pomo-toggle')?.addEventListener('click', () => {
+              if (isRunning) {
+                clearInterval(timerId);
+                timerId = null;
+                isRunning = false;
+              } else {
+                isRunning = true;
+                timerId = setInterval(() => {
+                  if (remaining > 0) {
+                    remaining--;
+                    render();
+                  } else {
+                    clearInterval(timerId);
+                    timerId = null;
+                    isRunning = false;
+                    playChime();
+                    context.showNotification(
+                      '🍅 Pomodoro Таймер',
+                      currentMode === 'focus' ? 'Время работы завершено! Пора отдохнуть.' : 'Перерыв окончен! Возвращаемся к делам.'
+                    );
+                    render();
+                  }
+                }, 1000);
+              }
+              render();
+            });
+
+            container.querySelector('#snapi-pomo-reset')?.addEventListener('click', () => {
+              if (timerId) { clearInterval(timerId); timerId = null; isRunning = false; }
+              remaining = duration;
+              render();
+            });
+          }
+
+          render();
+          document.body.appendChild(container);
         },
+
+        uninstall(context) {
+          console.log('[Pomodoro Plugin] Отключен');
+          const existing = document.getElementById('snapi-plugin-pomodoro');
+          if (existing && existing.parentNode) {
+            existing.parentNode.removeChild(existing);
+          }
+        }
+      };
+    `
+  },
+  {
+    id: 'quick-notes',
+    name: 'Quick Notes & Scratchpad',
+    version: '1.0.2',
+    desc: 'Встроенный блокнот для быстрых заметок, списков задач и сниппетов кода с автосохранением на ПК.',
+    author: 'DevAlex',
+    icon: 'FileText',
+    categoryId: 'utils',
+    downloads: 330,
+    rating: 4.92,
+    hasTheme: false,
+    styles: `
+      .snapi-quicknotes-container {
+        position: fixed;
+        bottom: 84px;
+        right: 24px;
+        z-index: 999998;
+        font-family: inherit;
+        user-select: none;
+      }
+      .snapi-quicknotes-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 9999px;
+        background: rgba(11, 17, 32, 0.9);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(255, 255, 255, 0.05);
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .snapi-quicknotes-badge:hover {
+        transform: translateY(-2px) scale(1.04);
+        border-color: rgba(56, 189, 248, 0.4);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.2);
+      }
+      .snapi-quicknotes-modal {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 320px;
+        padding: 16px;
+        border-radius: 20px;
+        background: rgba(11, 17, 32, 0.94);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.1);
+        color: #fff;
+        animation: snapiQnFadeIn 0.25s ease-out;
+      }
+      @keyframes snapiQnFadeIn {
+        from { opacity: 0; transform: translateY(12px) scale(0.95); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+    `,
+    code: `
+      export default {
+        install(context) {
+          console.log('[Plugin: Quick Notes] Активирован');
+          context.showNotification('Quick Notes', 'Блокнот для заметок открыт!');
+
+          const STORAGE_KEY = 'snapi_scratchpad_notes';
+          let isOpen = false;
+
+          const container = document.createElement('div');
+          container.id = 'snapi-plugin-quicknotes';
+          container.className = 'snapi-quicknotes-container';
+
+          function render() {
+            const savedText = localStorage.getItem(STORAGE_KEY) || '';
+
+            if (!isOpen) {
+              container.innerHTML = '<button id=\"snapi-qn-badge\" class=\"snapi-quicknotes-badge\" title=\"Открыть быстрый блокнот\">' +
+                '<span>📝</span>' +
+                '<span style=\"font-weight: 600; font-size: 12px;\">Заметки</span>' +
+              '</button>';
+              container.querySelector('#snapi-qn-badge')?.addEventListener('click', () => {
+                isOpen = true;
+                render();
+              });
+              return;
+            }
+
+            container.innerHTML = '<div class=\"snapi-quicknotes-modal\">' +
+              '<div style=\"display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);\">' +
+                '<div style=\"display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 13px;\">' +
+                  '<span>📝</span>' +
+                  '<span>Быстрый блокнот</span>' +
+                '</div>' +
+                '<div style=\"display: flex; gap: 6px;\">' +
+                  '<button id=\"snapi-qn-copy\" style=\"background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #e2e8f0; cursor: pointer; padding: 3px 8px; border-radius: 8px; font-size: 11px;\" title=\"Скопировать всё\">Копировать</button>' +
+                  '<button id=\"snapi-qn-close\" style=\"background: transparent; border: none; color: #94a3b8; cursor: pointer; padding: 2px 6px; border-radius: 6px; font-size: 14px;\" title=\"Свернуть\">✕</button>' +
+                '</div>' +
+              '</div>' +
+              '<textarea id=\"snapi-qn-text\" placeholder=\"Введите быстрые мысли, задачи или сниппеты кода...\" style=\"width: 100%; height: 160px; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; color: #f8fafc; font-size: 12px; font-family: monospace; padding: 10px; resize: none; outline: none; box-sizing: border-box;\"></textarea>' +
+              '<div style=\"display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #94a3b8; padding-top: 4px;\">' +
+                '<span id=\"snapi-qn-status\">Автосохранение активно</span>' +
+                '<button id=\"snapi-qn-clear\" style=\"background: transparent; border: none; color: #f87171; cursor: pointer; font-size: 10px;\">Очистить</button>' +
+              '</div>' +
+            '</div>';
+
+            const textarea = container.querySelector('#snapi-qn-text');
+            if (textarea) {
+              textarea.value = savedText;
+              textarea.focus();
+              textarea.addEventListener('input', (e) => {
+                localStorage.setItem(STORAGE_KEY, e.target.value);
+                const status = container.querySelector('#snapi-qn-status');
+                if (status) {
+                  status.textContent = 'Сохранено ✓';
+                  setTimeout(() => { if (status) status.textContent = 'Автосохранение активно'; }, 1000);
+                }
+              });
+            }
+
+            container.querySelector('#snapi-qn-close')?.addEventListener('click', () => {
+              isOpen = false;
+              render();
+            });
+
+            container.querySelector('#snapi-qn-copy')?.addEventListener('click', () => {
+              const text = localStorage.getItem(STORAGE_KEY) || '';
+              if (text) {
+                navigator.clipboard.writeText(text);
+                const copyBtn = container.querySelector('#snapi-qn-copy');
+                if (copyBtn) {
+                  copyBtn.textContent = 'Скопировано!';
+                  setTimeout(() => { if (copyBtn) copyBtn.textContent = 'Копировать'; }, 1500);
+                }
+              }
+            });
+
+            container.querySelector('#snapi-qn-clear')?.addEventListener('click', () => {
+              if (confirm('Очистить текст блокнота?')) {
+                localStorage.removeItem(STORAGE_KEY);
+                if (textarea) textarea.value = '';
+              }
+            });
+          }
+
+          render();
+          document.body.appendChild(container);
+        },
+
         uninstall(context) {
           console.log('[Plugin: Quick Notes] Отключен');
+          const existing = document.getElementById('snapi-plugin-quicknotes');
+          if (existing && existing.parentNode) {
+            existing.parentNode.removeChild(existing);
+          }
         }
       };
     `

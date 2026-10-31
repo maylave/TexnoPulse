@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { X, Sparkles, Palette, FileCode, FileText, Bot, RefreshCw, Puzzle } from 'lucide-vue-next'
+import { X, Sparkles, Palette, FileCode, FileText, Bot, RefreshCw, Puzzle, Timer } from 'lucide-vue-next'
 import UiToggle from '@/components/ui/UiToggle.vue'
 
 const props = defineProps<{
@@ -19,6 +19,7 @@ const iconComponent = computed(() => {
   if (iconName.includes('palette') || iconName.includes('theme')) return Palette
   if (iconName.includes('code') || iconName.includes('matrix')) return FileCode
   if (iconName.includes('text') || iconName.includes('note')) return FileText
+  if (iconName.includes('clock') || iconName.includes('timer') || iconName.includes('pomo')) return Timer
   if (iconName.includes('bot') || iconName.includes('ai')) return Bot
   if (iconName.includes('sync')) return RefreshCw
   return Puzzle

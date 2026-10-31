@@ -13,7 +13,9 @@ import {
   RefreshCw,
   Puzzle,
   Loader2,
-  Layers
+  Layers,
+  Timer,
+  Clock
 } from 'lucide-vue-next'
 import UiToggle from '@/components/ui/UiToggle.vue'
 
@@ -38,6 +40,7 @@ const iconComponent = computed(() => {
   if (iconName.includes('palette') || iconName.includes('theme') || iconName.includes('paint')) return Palette
   if (iconName.includes('code') || iconName.includes('matrix')) return FileCode
   if (iconName.includes('text') || iconName.includes('note')) return FileText
+  if (iconName.includes('clock') || iconName.includes('timer') || iconName.includes('pomo')) return Timer
   if (iconName.includes('bot') || iconName.includes('ai')) return Bot
   if (iconName.includes('sync')) return RefreshCw
   if (iconName.includes('layer')) return Layers
