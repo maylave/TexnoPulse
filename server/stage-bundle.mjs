@@ -62,6 +62,10 @@ patchPeToGui(bundledNodeExe);
 
 // 5. Запуск caxa с флагом --no-include-node (чтобы не перезаписывать наш пропатченный node.exe)
 // и уникальным --identifier (чтобы не использовать старый кэш из Temp/caxa)
+try {
+  execSync("taskkill /F /IM server.exe /IM snapi-server.exe 2>nul", { stdio: "ignore" });
+} catch {}
+
 const buildId = `snapi-${Date.now()}`;
 console.log(`Building server.exe with caxa (identifier: ${buildId}, no-include-node)...`);
 execSync(

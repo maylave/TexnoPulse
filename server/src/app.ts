@@ -13,6 +13,7 @@ import { handleTextPacket, handleBinaryPacket } from "./network/handlers.js";
 
 import { appServer } from "./api/AppServer.js";
 import { fileRoutes } from "./api/fileRoutes.js";
+import { pluginRoutes } from "./api/pluginRoutes.js";
 import { registerChatHandlers } from "./api/chatHandlers.js";
 import { registerMessageHandlers } from "./api/messageHanglers.js";
 import { registerDeviceHandlers } from "./api/deviceHandlers.js";
@@ -99,6 +100,7 @@ export async function startApp() {
   });
 
   appServer.addRoute(fileRoutes);
+  appServer.addRoute(pluginRoutes);
 
   // Выбираем порт: из env SNAPI_PORT, аргумента --port или сохраненного port.json (по умолч. 3000)
   let preferredPort = 3000;

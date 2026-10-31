@@ -28,6 +28,8 @@ Snapi-Setup.exe
 *.local
 .port.json
 port.json
+data
+server/data
 
 # Editor directories and files
 .vscode/*

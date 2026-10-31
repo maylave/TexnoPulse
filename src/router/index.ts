@@ -34,11 +34,12 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
 	const userName = localStorage.getItem('snapi_user_name')
 
-	// Исключения: стартовый экран, окно уведомлений и установщик не требуют авторизации
+	// Исключения: стартовый экран, окно уведомлений, установщик и плагины не требуют авторизации
 	if (
 		to.name === 'start' ||
 		to.name === 'notification' ||
-		to.name === 'installer'
+		to.name === 'installer' ||
+		to.name === 'plugin'
 	) {
 		return next()
 	}

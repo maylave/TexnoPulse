@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { Settings as SettingsIcon } from "lucide-vue-next";
+import { useRouter } from "vue-router";
+import { Settings as SettingsIcon, Puzzle } from "lucide-vue-next";
 import Search from "../sidebar/Search.vue";
 import ChatList from "../chat-list/ChatList.vue";
 import { useAppStore } from "@/stores/appLayout"; 
 import { useModalStore } from "@/stores/appModal";
 
+const router = useRouter();
 const appStore = useAppStore();
 const modalStore = useModalStore();
 const searchQuery = ref("");
@@ -19,13 +21,22 @@ const searchQuery = ref("");
     <!-- Внутренняя обертка с фиксированной шириной -->
     <div class="w-[var(--sidebar-width,280px)] h-full flex flex-col">
       
-      <!-- Шапка сайдбара: Поиск + Настройки + Кнопка закрытия -->
-      <div class="p-4 shrink-0 flex items-center gap-2">
+      <!-- Шапка сайдбара: Поиск + Плагины + Настройки + Кнопка закрытия -->
+      <div class="p-4 shrink-0 flex items-center gap-1.5">
         
         <!-- Обертка поиска: flex-1 дает занять свободное место, min-w-0 не дает вытолкнуть кнопку -->
         <div class="flex-1 min-w-0">
           <Search v-model="searchQuery" class="w-full" />
         </div>
+
+        <!-- Кнопка перехода в маркетплейс плагинов и тем -->
+        <button 
+          @click="router.push('/plugin')"
+          class="shrink-0 p-2 flex items-center justify-center rounded-full text-[var(--color-on-surface-variant)] hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+          title="Каталог плагинов и тем"
+        >
+          <Puzzle class="w-4 h-4 text-sky-400" />
+        </button>
         
         <!-- Кнопка открытия настроек -->
         <button 
