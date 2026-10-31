@@ -1,0 +1,40 @@
+import { Route, Routes } from 'react-router-dom'
+import MainLayout from './components/layout/MainLayout'
+import AuthLayout from './components/layout/AuthLayout'
+import DashboardLayout from './components/layout/DashboardLayout'
+import Home from './pages/Home'
+import Auth from './pages/Auth'
+import Welcome from './pages/Welcome'
+import DashboardHome from './pages/dashboard/Home'
+import Dictionary from './pages/dashboard/Dictionary'
+import Students from './pages/dashboard/Students'
+import NotFound from './pages/NotFound'
+
+export default function App() {
+  return (
+    <Routes>
+      {/* Сайт: шапка и подвал */}
+      <Route element={<MainLayout />}>
+        <Route path="/" element={<Home />} />
+      </Route>
+
+      {/* Вход и регистрация: без шапки и подвала */}
+      <Route element={<AuthLayout />}>
+        <Route path="/auth" element={<Auth />} />
+      </Route>
+
+      {/* Приветствие: полноэкранная анимация */}
+      <Route path="/welcome" element={<Welcome />} />
+
+      {/* Личный кабинет: один макет для всех ролей, у каждой свои кнопки */}
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<DashboardHome />} />
+        <Route path="dictionary" element={<Dictionary />} />
+        <Route path="students" element={<Students />} />
+      </Route>
+
+      {/* Любой другой адрес: страница 404 */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  )
+}

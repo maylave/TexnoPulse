@@ -1,0 +1,14 @@
+[WS Server] Зарегистрировано действие: chat:load
+[WS Server] Зарегистрировано действие: chat:create
+[WS Server] Зарегистрировано действие: chat:update
+[WS Server] Зарегистрировано действие: chat:move
+[WS Server] Зарегистрировано действие: chat:delete
+[WS Server] Зарегистрировано действие: message:load
+[WS Server] Зарегистрировано действие: message:send
+[WS Server] Зарегистрировано действие: message:edit
+[WS Server] Зарегистрировано действие: message:delete
+[WS Server] Зарегистрировано действие: device:approve
+[WS Server] Зарегистрировано действие: device:block
+[WS Server] Зарегистрировано действие: app:me
+[App] Все модули успешно запущены!
+[WS Server] Запущен на ws://127.0.0.1:3000

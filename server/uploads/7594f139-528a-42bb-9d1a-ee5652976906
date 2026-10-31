@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2P WS Test Client</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; padding: 20px; max-width: 600px; margin: auto; background: #f4f4f9; }
+        .box { background: white; border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover:not(:disabled) { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        #log { height: 300px; overflow-y: auto; background: #1e1e1e; color: #00ff00; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 13px; word-wrap: break-word; }
+        .log-out { color: #569cd6; }
+        .log-in { color: #ce9178; }
+        .log-sys { color: #dcdcaa; }
+        .log-err { color: #f44747; }
+        
+        .file-section { background: #eef2f5; border-left: 4px solid #007bff; }
+        
+        /* Стили для прогресс-бара */
+        .progress-bar-bg { width: 100%; background-color: #dee2e6; border-radius: 4px; margin-top: 10px; display: none; overflow: hidden; height: 12px; }
+        .progress-bar-fill { height: 100%; width: 0%; background-color: #28a745; transition: width 0.3s ease; }
+        
+        /* Стили для всплывающих уведомлений (Toast) */
+        .toast { visibility: hidden; min-width: 250px; text-align: center; border-radius: 6px; padding: 12px 20px; position: fixed; z-index: 1000; right: 20px; top: 20px; font-size: 15px; font-weight: bold; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: opacity 0.3s, transform 0.3s; opacity: 0; transform: translateY(-20px); }
+        .toast.show { visibility: visible; opacity: 1; transform: translateY(0); }
+        .toast.success { background-color: #28a745; }
+        .toast.error { background-color: #dc3545; }
+        .toast.info { background-color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <!-- Контейнер для уведомлений -->
+    <div id="toast" class="toast">Уведомление</div>
+
+    <h2>Тест P2P Бекенда</h2>
+    
+    <div class="box">
+        <label>Адрес WS сервера:</label>
+        <input type="text" id="wsUrl" value="ws://localhost:8080">
+        
+        <label>Твой Device ID (для AUTH):</label>
+        <input type="text" id="deviceId" value="test-pc-01">
+        
+        <button onclick="connect()" id="connectBtn">Подключиться</button>
+        <button onclick="disconnect()" id="disconnectBtn" style="display: none; background: #dc3545;">Отключиться</button>
+    </div>
+
+    <div class="box">
+        <label>Сырой JSON Пакет (payload):</label>
+        <input type="text" id="msgInput" value='{"type": "MESSAGE_SYNC", "senderDeviceId": "test-pc-01", "payload": {"action": "NEW_MESSAGE", "data": {"message": {"id": "test-pc-01-999", "chatId": "test-chat-1", "senderId": "test-pc-01", "type": "text", "text": "Привет! Проверка записи в БД.", "createdAt": 1728000000000}}}}'>
+        <button onclick="sendMsg()" id="sendBtn" disabled>Отправить JSON</button>
+    </div>
+
+    <!-- БЛОК ДЛЯ ОТПРАВКИ ФАЙЛОВ С ПРОГРЕССОМ -->
+    <div class="box file-section">
+        <label>Отправка файла (Бинарный стрим):</label>
+        <input type="file" id="fileInput">
+        
+        <div id="progressBg" class="progress-bar-bg">
+            <div id="progressFill" class="progress-bar-fill"></div>
+        </div>
+
+        <button onclick="sendFile()" id="sendFileBtn" disabled>Отправить файл</button>
+    </div>
+
+    <h3>Консоль:</h3>
+    <div id="log"></div>
+
+    <script>
+        let ws;
+        const logDiv = document.getElementById('log');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const sendFileBtn = document.getElementById('sendFileBtn');
+        
+        // Элементы прогресс-бара
+        const progressBg = document.getElementById('progressBg');
+        const progressFill = document.getElementById('progressFill');
+
+        // Функция показа уведомлений (Toast)
+        function showNotification(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            
+            // Скрываем через 3 секунды
+            setTimeout(() => { 
+                toast.className = toast.className.replace('show', ''); 
+            }, 3000);
+        }
+
+        function printLog(msg, type = 'sys') {
+            const p = document.createElement('div');
+            p.className = `log-${type}`;
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logDiv.prepend(p); 
+        }
+
+        function connect() {
+            const url = document.getElementById('wsUrl').value;
+            const deviceId = document.getElementById('deviceId').value;
+            
+            printLog('Попытка подключения к ' + url + '...', 'sys');
+            ws = new WebSocket(url);
+            ws.binaryType = "arraybuffer";
+            
+            ws.onopen = () => {
+                printLog('✅ Успешно подключено!', 'sys');
+                showNotification('Подключено к серверу', 'info');
+                connectBtn.style.display = 'none';
+                disconnectBtn.style.display = 'block';
+                sendBtn.disabled = false;
+                sendFileBtn.disabled = false;
+                
+                const authMsg = { type: 'AUTH', deviceId: deviceId };
+                ws.send(JSON.stringify(authMsg));
+                printLog('⬆️ Отправлен AUTH пакет', 'log-out');
+            };
+            
+            ws.onmessage = (event) => {
+                if (event.data instanceof ArrayBuffer) {
+                    printLog(`⬇️ Прилетел бинарный пакет! Размер: ${event.data.byteLength} байт`, 'log-in');
+                    return;
+                }
+                printLog('⬇️ Получено: ' + event.data, 'log-in');
+            };
+            
+            ws.onclose = () => {
+                printLog('❌ Соединение закрыто', 'log-err');
+                showNotification('Отключено от сервера', 'error');
+                resetUI();
+            };
+            
+            ws.onerror = (err) => {
+                printLog('⚠️ Ошибка WebSocket соединения', 'log-err');
+            };
+        }
+
+        function disconnect() {
+            if (ws) ws.close();
+        }
+
+        function sendMsg() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) return;
+            const val = document.getElementById('msgInput').value;
+            
+            try {
+                JSON.parse(val); 
+                ws.send(val);
+                printLog('⬆️ Отправлен JSON', 'log-out');
+                showNotification('Пакет отправлен');
+            } catch (e) {
+                printLog('⚠️ Ошибка: введен невалидный JSON!', 'log-err');
+                showNotification('Невалидный JSON', 'error');
+            }
+        }
+
+        // Обновленная логика отправки файла
+        async function sendFile() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                showNotification('Нет соединения с сервером', 'error');
+                return;
+            }
+            
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showNotification('Выберите файл для отправки', 'error');
+                return;
+            }
+
+            // Блокируем UI на время загрузки
+            sendFileBtn.disabled = true;
+            sendFileBtn.textContent = 'Обработка...';
+            progressBg.style.display = 'block';
+            progressFill.style.width = '10%'; // Имитация начала процесса
+
+            try {
+                const fileId = crypto.randomUUID(); 
+                const headerBytes = new TextEncoder().encode(fileId); 
+
+                progressFill.style.width = '40%'; // Сгенерировали заголовки
+
+                // Читаем файл
+                const fileBuffer = await file.arrayBuffer();
+                progressFill.style.width = '70%'; // Прочитали в память
+                
+                // Склеиваем
+                const combinedBuffer = new Uint8Array(36 + fileBuffer.byteLength);
+                combinedBuffer.set(headerBytes, 0); 
+                combinedBuffer.set(new Uint8Array(fileBuffer), 36); 
+                
+                progressFill.style.width = '90%'; // Готово к отправке
+
+                // Отправляем в WebSocket
+                ws.send(combinedBuffer);
+                
+                progressFill.style.width = '100%'; // Отправлено в сокет ОС
+                
+                printLog(`⬆️ Отправлен файл: ${file.name} (ID: ${fileId})`, 'log-out');
+                showNotification('Файл успешно отправлен!');
+                
+                // Очистка UI после успеха
+                setTimeout(() => {
+                    progressBg.style.display = 'none';
+                    progressFill.style.width = '0%';
+                    fileInput.value = ''; 
+                }, 1500);
+
+            } catch (err) {
+                printLog(`⚠️ Ошибка при отправке файла: ${err.message}`, 'log-err');
+                showNotification('Ошибка при обработке файла', 'error');
+            } finally {
+                // Разблокируем кнопку
+                sendFileBtn.disabled = false;
+                sendFileBtn.textContent = 'Отправить файл';
+            }
+        }
+
+        function resetUI() {
+            connectBtn.style.display = 'block';
+            disconnectBtn.style.display = 'none';
+            sendBtn.disabled = true;
+            sendFileBtn.disabled = true;
+            ws = null;
+        }
+    </script>
+</body>
+</html>

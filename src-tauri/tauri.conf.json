@@ -1,0 +1,84 @@
+{
+	"$schema": "https://schema.tauri.app/config/2",
+	"productName": "Snapi",
+	"version": "0.0.12",
+	"identifier": "com.mi.snapi-app",
+	"build": {
+		"beforeDevCommand": "npm run dev",
+		"devUrl": "http://localhost:1420",
+		"beforeBuildCommand": "npm run build",
+		"frontendDist": "../dist"
+	},
+	"app": {
+		"windows": [
+			{
+				"label": "main",
+				"title": "Snapi",
+				"width": 1280,
+				"height": 820,
+				"minWidth": 800,
+				"minHeight": 600,
+				"decorations": true,
+				"transparent": false,
+				"visible": false,
+				"center": true
+			},
+			{
+				"label": "notification",
+				"title": "Уведомление",
+				"width": 350,
+				"url": "index.html#/notification",
+				"height": 160,
+				"decorations": false,
+				"transparent": true,
+				"alwaysOnTop": true,
+				"visible": false,
+				"shadow": false,
+				"skipTaskbar": true
+			},
+			{
+				"label": "installer",
+				"title": "Установка Snapi",
+				"width": 640,
+				"height": 520,
+				"url": "index.html#/installer",
+				"decorations": false,
+				"transparent": true,
+				"center": true,
+				"visible": false,
+				"resizable": false,
+				"skipTaskbar": false
+			}
+		],
+		"security": {
+			"csp": null
+		}
+	},
+	"bundle": {
+		"active": true,
+		"targets": "all",
+		"externalBin": [
+			"binaries/snapi-server"
+		],
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		],
+		"windows": {
+			"nsis": {
+				"installerIcon": "icons/icon.ico",
+				"headerImage": "icons/installer-header.bmp",
+				"sidebarImage": "icons/installer-sidebar.bmp",
+				"installMode": "currentUser",
+				"languages": [
+					"Russian",
+					"English"
+				],
+				"displayLanguageSelector": true
+			}
+		}
+	}
+}

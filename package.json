@@ -1,0 +1,46 @@
+{
+	"name": "snapi-app",
+	"private": true,
+	"version": "0.0.12",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"dev:ui": "vite",
+		"dev:server": "npm --prefix server run dev",
+		"dev:all": "node scripts/dev.mjs",
+		"dev:tauri": "tauri dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"tauri": "tauri",
+		"bump:version": "node scripts/bump-version.mjs",
+		"build:server": "node server/stage-bundle.mjs",
+		"build:app": "npm run bump:version && npm run build:server && tauri build",
+		"build:setup": "npm run bump:version && node scripts/build-custom-installer.mjs",
+		"build:msi": "npm run bump:version && npm run build:server && tauri build --bundles msi"
+	},
+	"dependencies": {
+		"@ckpack/vue-color": "^1.6.0",
+		"@dev.icons/vue": "^1.1.0",
+		"@tailwindcss/vite": "^4.3.2",
+		"@tauri-apps/api": "^2",
+		"@tauri-apps/plugin-opener": "^2",
+		"@vscode/codicons": "^0.0.45",
+		"@vueuse/core": "^14.4.0",
+		"highlight.js": "^11.12.0",
+		"lucide-vue-next": "^1.0.0",
+		"node-notifier": "^11.0.0",
+		"pinia": "^3.0.4",
+		"shiki": "^4.5.0",
+		"tailwindcss": "^4.3.2",
+		"vue": "^3.5.13",
+		"vue-router": "^5.1.0"
+	},
+	"devDependencies": {
+		"@tauri-apps/cli": "^2",
+		"@types/node": "^26.6.5",
+		"@vitejs/plugin-vue": "^6.0.7",
+		"typescript": "~6.0.3",
+		"vite": "^8.0.16",
+		"vue-tsc": "^3.3.5"
+	}
+}

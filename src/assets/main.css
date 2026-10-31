@@ -1,0 +1,586 @@
+@import 'tailwindcss';
+
+@theme static {
+	/* ============================================
+     AETHER PKM SYSTEM — Design Tokens
+     ============================================ */
+
+	/* --- Surface Levels --- */
+	--color-surface: #051424;
+	--color-surface-dim: #051424;
+	--color-surface-bright: #2c3a4c;
+	--color-surface-container-lowest: #010f1f;
+	--color-surface-container-low: #0d1c2d;
+	--color-surface-container: #122131;
+	--color-surface-container-high: #1c2b3c;
+	--color-surface-container-highest: #273647;
+	--color-surface-variant: #273647;
+
+	/* --- On-Surface --- */
+	--color-on-surface: #d4e4fa;
+	--color-on-surface-variant: #c6c6cc;
+
+	/* --- Inverse --- */
+	--color-inverse-surface: #d4e4fa;
+	--color-inverse-on-surface: #233143;
+	--color-inverse-primary: #585e6f;
+
+	/* --- Primary --- */
+	--color-primary: #c0c6da;
+	--color-on-primary: #2a3040;
+	--color-primary-container: #0b1220;
+	--color-on-primary-container: #777d8f;
+	--color-primary-fixed: #dce2f6;
+	--color-primary-fixed-dim: #c0c6da;
+	--color-on-primary-fixed: #151b2a;
+	--color-on-primary-fixed-variant: #404757;
+
+	/* --- Secondary --- */
+	--color-secondary: #bec6dd;
+	--color-on-secondary: #283042;
+	--color-secondary-container: #3e475a;
+	--color-on-secondary-container: #acb5cb;
+	--color-secondary-fixed: #dae2fa;
+	--color-secondary-fixed-dim: #bec6dd;
+	--color-on-secondary-fixed: #121c2c;
+	--color-on-secondary-fixed-variant: #3e475a;
+
+	/* --- Tertiary --- */
+	--color-tertiary: #bcc6e0;
+	--color-on-tertiary: #263045;
+	--color-tertiary-container: #071225;
+	--color-on-tertiary-container: #737d95;
+	--color-tertiary-fixed: #d8e2fd;
+	--color-tertiary-fixed-dim: #bcc6e0;
+	--color-on-tertiary-fixed: #111b2f;
+	--color-on-tertiary-fixed-variant: #3d475c;
+
+	/* --- Error --- */
+	--color-error: #ffb4ab;
+	--color-on-error: #690005;
+	--color-error-container: #93000a;
+	--color-on-error-container: #ffdad6;
+
+	/* --- Outline --- */
+	--color-outline: #909096;
+	--color-outline-variant: #2e3033;
+
+	/* --- Surface Tint --- */
+	--color-surface-tint: #c0c6da;
+
+	/* --- Background --- */
+	--color-background: #051424;
+	--color-on-background: #d4e4fa;
+
+	/* --- Accent (hover/active следуют за основным цветом) --- */
+	--color-accent: #4ea8ff;
+	--color-accent-hover: color-mix(in srgb, var(--color-accent) 85%, white);
+	--color-accent-active: color-mix(in srgb, var(--color-accent) 85%, black);
+
+	/* ============================================
+     ALIASES — следуют за основными токенами
+     ============================================ */
+	--color-sky-50: var(--color-on-surface);
+	--color-sky-100: var(--color-on-surface-variant);
+	--color-sky-200: var(--color-primary);
+	--color-sky-300: var(--color-outline);
+	--color-sky-400: var(--color-accent);
+	--color-sky-500: #45474c;
+	--color-sky-600: var(--color-on-primary);
+	--color-sky-700: var(--color-surface-container);
+	--color-sky-800: var(--color-surface-container-low);
+	--color-sky-900: var(--color-surface);
+
+	--color-frame-950: var(--color-surface-container-lowest);
+	--color-frame-900: var(--color-surface);
+	--color-frame-800: var(--color-surface-container);
+	--color-frame-700: var(--color-surface-container-high);
+	--color-frame-600: var(--color-surface-container-highest);
+
+	--color-amber-400: var(--color-on-surface-variant);
+	--color-amber-500: var(--color-outline);
+	--color-rose-500: var(--color-error);
+
+	/* ============================================
+     GLOBAL: границы и анимации
+     ============================================ */
+	--glass-border-color: #ffffff;
+	--glass-border-opacity: 0.1;
+	--glass-border: color-mix(
+		in srgb,
+		var(--glass-border-color) calc(var(--glass-border-opacity) * 100%),
+		transparent
+	);
+
+	/* Множитель длительности анимаций: 0.5 быстрее, 2 медленнее */
+	--anim-scale: 1;
+
+	/* ============================================
+     CONTEXT MENU
+     ============================================ */
+	--menu-bg-opacity: 0.85;
+	--menu-bg: color-mix(
+		in srgb,
+		var(--color-surface-container) calc(var(--menu-bg-opacity) * 100%),
+		transparent
+	);
+	--menu-text: var(--color-on-surface);
+	--menu-text-muted: var(--color-on-surface-variant);
+	--menu-hover: rgba(255, 255, 255, 0.08);
+	--menu-border: var(--glass-border);
+	--menu-danger: var(--color-error);
+	--menu-radius: 16px;
+	--menu-item-radius: 0.625rem;
+	--menu-width: 16rem;
+	--menu-padding: 0.375rem;
+	--menu-blur: 20px;
+	--menu-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+	--menu-anim: calc(120ms * var(--anim-scale));
+
+	/* ============================================
+     CHAT INPUT
+     ============================================ */
+	--input-bg-color: #0f172a;
+	--input-bg-opacity: 0.45;
+	--input-bg: color-mix(
+		in srgb,
+		var(--input-bg-color) calc(var(--input-bg-opacity) * 100%),
+		transparent
+	);
+	--input-border: var(--glass-border);
+	--input-radius: 32px;
+	--input-blur: 24px;
+	--input-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+	--input-max-height: 150px;
+	--input-font-size: 15px;
+
+	/* Текст */
+	--input-text: var(--color-on-surface);
+	--input-placeholder: color-mix(
+		in srgb,
+		var(--color-on-surface-variant) 70%,
+		transparent
+	);
+
+	/* Анимированная рамка */
+	--input-glow: #ffffff;
+	/* первый цвет */
+	--input-glow-2: #ffffff;
+	/* второй цвет (сделай другим для двухцветной рамки) */
+	--input-glow-width: 1.5px;
+	/* толщина */
+	--input-glow-speed: 4s;
+	/* время одного оборота */
+	--input-glow-opacity: 1;
+	/* 0 = рамка выключена */
+
+	/* Кнопка отправки */
+	--input-send-bg: var(--color-accent);
+	--input-send-bg-hover: var(--color-accent-hover);
+	--input-send-text: #ffffff;
+	--input-send-glow: var(--color-accent);
+
+	/* ============================================
+     TYPOGRAPHY
+     ============================================ */
+	--font-family-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+	--font-size-display: 48px;
+	--font-size-display--line-height: 1.2;
+	--font-size-display--letter-spacing: -0.02em;
+	--font-size-display--font-weight: 600;
+
+	--font-size-headline-lg: 32px;
+	--font-size-headline-lg--line-height: 1.25;
+	--font-size-headline-lg--letter-spacing: -0.01em;
+	--font-size-headline-lg--font-weight: 600;
+
+	--font-size-headline-md: 20px;
+	--font-size-headline-md--line-height: 1.4;
+	--font-size-headline-md--font-weight: 500;
+
+	--font-size-body-lg: 16px;
+	--font-size-body-lg--line-height: 1.6;
+	--font-size-body-lg--font-weight: 400;
+
+	--font-size-body-md: 14px;
+	--font-size-body-md--line-height: 1.5;
+	--font-size-body-md--font-weight: 400;
+
+	--font-size-label-md: 12px;
+	--font-size-label-md--line-height: 1.2;
+	--font-size-label-md--letter-spacing: 0.05em;
+	--font-size-label-md--font-weight: 500;
+
+	--font-size-caption: 12px;
+	--font-size-caption--line-height: 1.4;
+	--font-size-caption--font-weight: 400;
+
+	/* ============================================
+     ROUNDED
+     ============================================ */
+	--radius-sm: 0.25rem;
+	--radius-default: 0.5rem;
+	--radius-md: 0.75rem;
+	--radius-lg: 1rem;
+	--radius-xl: 1.5rem;
+	--radius-full: 9999px;
+
+	/* ============================================
+     SPACING
+     ============================================ */
+	--spacing-unit: 4px;
+	--spacing-xs: 4px;
+	--spacing-sm: 8px;
+	--spacing-md: 16px;
+	--spacing-lg: 24px;
+	--spacing-xl: 40px;
+	--spacing-gutter: 24px;
+	--spacing-margin-desktop: 64px;
+	--spacing-margin-mobile: 16px;
+
+	/* ============================================
+     SIDEBAR
+     ============================================ */
+	--sidebar-width: 280px;
+	--sidebar-item-radius: 8px;
+	--sidebar-active-indicator-width: 3px;
+	--sidebar-bg-color: #1a1b1e;
+	--sidebar-bg-opacity: 0.4;
+	--sidebar-bg: color-mix(
+		in srgb,
+		var(--sidebar-bg-color) calc(var(--sidebar-bg-opacity) * 100%),
+		transparent
+	);
+
+	/* ============================================
+     CHAT HEADER
+     ============================================ */
+	--header-bg-color: #1e293b;
+	--header-bg-opacity: 0.4;
+	--header-glass-bg: color-mix(
+		in srgb,
+		var(--header-bg-color) calc(var(--header-bg-opacity) * 100%),
+		transparent
+	);
+	--header-glass-bg-focus: color-mix(
+		in srgb,
+		var(--header-bg-color) calc(min(1, var(--header-bg-opacity) + 0.3) * 100%),
+		transparent
+	);
+	--header-hover: rgba(255, 255, 255, 0.05);
+	--header-border: var(--glass-border);
+	--header-border-focus: color-mix(
+		in srgb,
+		var(--color-accent) 40%,
+		transparent
+	);
+	--header-glow-focus: color-mix(in srgb, var(--color-accent) 10%, transparent);
+	--header-text: var(--color-on-surface);
+	--header-icon: var(--color-on-surface-variant);
+	--header-icon-active: var(--color-accent);
+	--header-placeholder: color-mix(
+		in srgb,
+		var(--color-on-surface-variant) 60%,
+		transparent
+	);
+	--header-search-width: 6.25rem;
+	--header-search-width-open: 25rem;
+	--header-anim: calc(300ms * var(--anim-scale));
+
+	/* ============================================
+     ATTACHMENTS
+     ============================================ */
+	--attach-bg: var(--input-bg);
+	--attach-border: var(--glass-border);
+	--attach-radius: 1.5rem;
+	--attach-blur: 24px;
+	--attach-gap: 0.5rem;
+	--attach-text: var(--color-on-surface);
+	--attach-muted: var(--color-on-surface-variant);
+	--attach-icon-bg: rgba(255, 255, 255, 0.08);
+	--attach-remove-hover: var(--color-error);
+	--attach-anim: calc(200ms * var(--anim-scale));
+
+	--search-width: 25rem;
+
+	/* ============================================
+     CHAT MESSAGES — Design Tokens
+     ============================================ */
+
+	/* --- Базовые стили пузыря --- */
+	--msg-bg-own: #1f3f5e;
+	/* Фон своего сообщения */
+	--msg-bg-other: #1c2b3c;
+	/* Фон чужого сообщения */
+	--msg-text-own: #d4e4fa;
+	/* Текст своего */
+	--msg-text-other: #d4e4fa;
+	/* Текст чужого */
+
+	/* --- Форма и скругления --- */
+	--msg-radius-base: var(--radius-lg);
+	/* Основное скругление (1rem) */
+	--msg-radius-corner: 0.25rem;
+	/* Острый уголок (4px) */
+	--msg-max-width: 85%;
+	/* Максимальная ширина пузыря */
+
+	/* --- Эффекты стекла --- */
+	--msg-blur: 16px;
+	/* Сила размытия фона */
+	--msg-border: 1px solid var(--glass-border);
+	/* Тонкая обводка */
+	--msg-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	/* Тень */
+
+	/* --- Типографика внутри сообщения --- */
+	--msg-font-size: var(--font-size-body-md);
+	/* Размер текста */
+	--msg-line-height: var(--font-size-body-md--line-height);
+	--msg-timestamp-opacity: 0.4;
+	/* Прозрачность времени */
+
+	/* ============================================
+		     EDITOR TOOLBAR
+		     ============================================ */
+	--toolbar-bg: color-mix(
+		in srgb,
+		var(--color-surface-container-lowest) 30%,
+		transparent
+	);
+	--toolbar-border: var(--glass-border);
+	--toolbar-radius: var(--radius-default);
+	--toolbar-anim: calc(200ms * var(--anim-scale));
+
+	--toolbar-btn-size: 30px;
+	--toolbar-icon-size: 0.875rem;
+	--toolbar-font-size: var(--font-size-label-md);
+	--toolbar-divider-height: 18px;
+
+	--toolbar-btn-text: var(--color-on-surface-variant);
+	--toolbar-btn-text-hover: var(--color-on-surface);
+	--toolbar-btn-hover: var(--menu-hover);
+	--toolbar-btn-active: color-mix(
+		in srgb,
+		var(--color-accent) 15%,
+		transparent
+	);
+	--toolbar-divider: var(--glass-border);
+
+	--toolbar-tab-text: var(--color-on-surface-variant);
+	--toolbar-tab-text-active: var(--color-on-surface);
+	--toolbar-tab-indicator: var(--color-accent);
+
+	/* ============================================
+		     DROPDOWN (UiDropdown; список берёт --menu-* токены)
+		     ============================================ */
+	--dropdown-height: 30px;
+	--dropdown-trigger-bg: color-mix(
+		in srgb,
+		var(--color-surface-container-lowest) 50%,
+		transparent
+	);
+	--dropdown-trigger-border: var(--glass-border);
+	--dropdown-trigger-border-hover: var(--header-border-focus);
+
+	/* ============================================
+		     EDITOR MODAL — спокойный глассморфизм
+		     ============================================ */
+	--editor-overlay-bg: rgba(2, 8, 16, 0.55);
+	--editor-overlay-blur: 6px;
+	--editor-bg: color-mix(
+		in srgb,
+		var(--color-surface-container) 62%,
+		transparent
+	);
+	--editor-blur: 28px;
+	--editor-saturate: 1.2;
+	--editor-border: color-mix(
+		in srgb,
+		var(--glass-border-color) 8%,
+		transparent
+	);
+	--editor-radius: 20px;
+	--editor-shadow:
+		0 24px 60px -12px rgba(0, 0, 0, 0.5),
+		inset 0 1px 0 rgba(255, 255, 255, 0.06);
+
+	--editor-sheet-bg: color-mix(
+		in srgb,
+		var(--color-surface-container-lowest) 35%,
+		transparent
+	);
+	--editor-sheet-radius: 14px;
+	--editor-sheet-max-width: 46rem;
+
+	--editor-block-radius: 12px;
+	--editor-code-bg: color-mix(
+		in srgb,
+		var(--color-surface-container-lowest) 70%,
+		transparent
+	);
+	--editor-file-bg: rgba(255, 255, 255, 0.03);
+	--bg-modal-overlay: color-mix(var(--msg-bg-other) 35%, transparent);
+	--search-dropdown-bg: color-mix(
+		in srgb,
+		var(--color-surface-container-lowest) 85%,
+		transparent
+	);
+	--search-dropdown-border: var(--glass-border);
+	--search-dropdown-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+	--search-dropdown-blur: 24px;
+	--transparent-settings: 90%;
+}
+/* ============================================
+   EDITOR UI KIT — ЦВЕТОВЫЕ ТЕМЫ РЕДАКТОРА И ХАЙЛАЙТЫ
+   ============================================ */
+:root,
+[data-editor-theme='aether'] {
+	--editor-overlay-bg: rgba(3, 10, 20, 0.78);
+	--editor-overlay-blur: 24px;
+	--editor-sheet-bg: rgba(13, 28, 45, 0.65);
+	--editor-sheet-max-width: 52rem;
+	--editor-sheet-radius: 1.5rem;
+	--editor-block-radius: 0.75rem;
+	--editor-border: rgba(255, 255, 255, 0.08);
+
+	--toolbar-bg: rgba(13, 28, 45, 0.85);
+	--toolbar-border: rgba(255, 255, 255, 0.08);
+	--toolbar-font-size: 12px;
+	--toolbar-tab-text: rgba(212, 228, 250, 0.55);
+	--toolbar-tab-text-active: #d4e4fa;
+	--toolbar-tab-indicator: var(--color-accent, #4ea8ff);
+	--toolbar-divider: rgba(255, 255, 255, 0.1);
+	--toolbar-divider-height: 18px;
+	--toolbar-btn-size: 30px;
+	--toolbar-icon-size: 15px;
+	--toolbar-radius: 8px;
+	--toolbar-anim: 150ms;
+}
+
+/* Тема 2: Obsidian Dark (Глубокий графит + фиолетовый акцент) */
+[data-editor-theme='obsidian'] {
+	--color-accent: #a78bfa;
+	--color-on-surface: #ececf1;
+	--color-on-surface-variant: #9ca3af;
+	--editor-sheet-bg: rgba(22, 22, 29, 0.85);
+	--toolbar-bg: rgba(17, 17, 23, 0.92);
+	--editor-border: rgba(255, 255, 255, 0.07);
+}
+
+/* Тема 3: Nord Frost (Холодный скандинавский сине-серый) */
+[data-editor-theme='nord'] {
+	--color-accent: #88c0d0;
+	--color-on-surface: #eceff4;
+	--color-on-surface-variant: #d8dee9;
+	--editor-sheet-bg: rgba(46, 52, 64, 0.85);
+	--toolbar-bg: rgba(36, 41, 51, 0.92);
+	--editor-border: rgba(216, 222, 233, 0.1);
+}
+
+/* Тема 4: Warm Paper (Светлая бумажная тема для конспектов) */
+[data-editor-theme='paper'] {
+	--color-accent: #2563eb;
+	--color-on-surface: #1e293b;
+	--color-on-surface-variant: #64748b;
+	--editor-sheet-bg: rgba(250, 248, 245, 0.96);
+	--toolbar-bg: rgba(241, 238, 233, 0.95);
+	--toolbar-tab-text: #64748b;
+	--toolbar-tab-text-active: #0f172a;
+	--editor-border: rgba(15, 23, 42, 0.1);
+	--toolbar-border: rgba(15, 23, 42, 0.08);
+	--toolbar-divider: rgba(15, 23, 42, 0.12);
+}
+
+/* Цвета выделения блоков (Block Highlights) */
+.block-hl-blue {
+	background: rgba(56, 189, 248, 0.1);
+	border-left: 3px solid #38bdf8;
+}
+
+.block-hl-emerald {
+	background: rgba(52, 211, 153, 0.1);
+	border-left: 3px solid #34d399;
+}
+
+.block-hl-amber {
+	background: rgba(251, 191, 36, 0.1);
+	border-left: 3px solid #fbbf24;
+}
+
+.block-hl-rose {
+	background: rgba(251, 113, 133, 0.1);
+	border-left: 3px solid #fb7185;
+}
+
+.block-hl-violet {
+	background: rgba(167, 139, 250, 0.1);
+	border-left: 3px solid #a78bfa;
+}
+
+.block-hl-slate {
+	background: rgba(148, 163, 184, 0.12);
+	border-left: 3px solid #94a3b8;
+}
+/* ============================================
+   Настройка «Анимации интерфейса» = выкл
+   ============================================ */
+:root[data-animations='off'] *,
+:root[data-animations='off'] *::before,
+:root[data-animations='off'] *::after {
+	animation-duration: 0.01ms !important;
+	animation-iteration-count: 1 !important;
+	transition-duration: 0.01ms !important;
+	transition-delay: 0ms !important;
+	scroll-behavior: auto !important;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+@layer utilities {
+	.glass-overlay {
+		background-color: rgba(62, 71, 90, 0.8);
+		backdrop-filter: blur(20px);
+		-webkit-backdrop-filter: blur(20px);
+		border: 1px solid var(--glass-border);
+	}
+
+	.glass-modal {
+		background-color: rgba(62, 71, 90, 0.8);
+		backdrop-filter: blur(30px);
+		-webkit-backdrop-filter: blur(30px);
+		border: 1px solid var(--glass-border);
+		box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.3);
+	}
+
+	.light-source-top {
+		border-top: 1px solid var(--glass-border);
+		border-left: 1px solid var(--glass-border);
+		border-right: 1px solid var(--glass-border);
+	}
+
+	.input-recessed {
+		background-color: var(--color-secondary-container);
+		border: 1px solid var(--glass-border);
+		box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+	}
+
+	.note-bubble {
+		border-radius: 1rem 1rem 1rem 0.25rem;
+	}
+
+	.note-bubble-right {
+		border-radius: 1rem 1rem 0.25rem 1rem;
+	}
+}
+/* Фикс для браузерного автозаполнения (убирает белый фон) */
+.autofill-fix:-webkit-autofill,
+.autofill-fix:-webkit-autofill:hover,
+.autofill-fix:-webkit-autofill:focus,
+.autofill-fix:-webkit-autofill:active {
+	-webkit-box-shadow: 0 0 0 30px var(--color-surface) inset !important;
+	-webkit-text-fill-color: var(--color-on-surface) !important;
+	transition: background-color 5000s ease-in-out 0s;
+}

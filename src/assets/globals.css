@@ -1,0 +1,185 @@
+/* src/assets/styles/globals.css */
+
+/* ============================================
+   GLOBAL SCROLLBAR STYLES
+   ============================================ */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(192, 198, 218, 0.1);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(192, 198, 218, 0.25);
+}
+
+/* ============================================
+   LIQUID GLASS EFFECT (Global Utility)
+   ============================================ */
+:root {
+  --liquid-glass-bg: linear-gradient(
+    135deg,
+    rgba(39, 54, 71, 0.6) 0%,
+    rgba(39, 54, 71, 0.3) 50%,
+    rgba(39, 54, 71, 0.5) 100%
+  );
+  --liquid-glass-bg-hover: linear-gradient(
+    135deg,
+    rgba(39, 54, 71, 0.7) 0%,
+    rgba(39, 54, 71, 0.4) 50%,
+    rgba(39, 54, 71, 0.6) 100%
+  );
+  --liquid-glass-blur: blur(24px) saturate(150%);
+  --liquid-glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --liquid-glass-border-hover: 1px solid rgba(255, 255, 255, 0.12);
+  --liquid-glass-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.08), inset 0 -1px 2px rgba(0, 0, 0, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
+  --liquid-glass-edge-gradient: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  --liquid-glass-sheen-gradient: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 40%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 60%,
+    transparent 100%
+  );
+  --liquid-glass-sheen-opacity: 0.5;
+  --message-border-bg: linear-gradient(
+    135deg,
+    rgba(78, 168, 255, 0.4) 0%,
+    rgba(78, 168, 255, 0.1) 30%,
+    rgba(188, 198, 224, 0.05) 60%,
+    rgba(188, 198, 224, 0.2) 100%
+  );
+  --message-border-bg-hover: linear-gradient(
+    135deg,
+    rgba(78, 168, 255, 0.6) 0%,
+    rgba(78, 168, 255, 0.2) 30%,
+    rgba(188, 198, 224, 0.1) 60%,
+    rgba(188, 198, 224, 0.3) 100%
+  );
+  --message-border-shadow:
+    0 8px 32px rgba(78, 168, 255, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  --message-border-shadow-hover:
+    0 12px 40px rgba(78, 168, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --message-content-bg: linear-gradient(
+    135deg,
+    rgba(18, 33, 49, 0.55) 0%,
+    rgba(28, 43, 60, 0.6) 100%
+  );
+  --message-blur: blur(20px) saturate(180%);
+  --message-time-color: rgba(198, 198, 204, 0.6);
+  --message-time-color-hover: rgba(78, 168, 255, 0.8);
+  --message-hover-transform: translateY(-2px);
+  --chatbox-glow-bg: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.05)
+  );
+  --chatbox-glow-blur: blur(20px);
+  --chatbox-glow-backdrop: blur(20px) saturate(140%);
+  --chatbox-pulse-bg: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.15),
+    rgba(255, 255, 255, 0.1),
+    rgba(148, 163, 184, 0.15)
+  );
+  --chatbox-pulse-backdrop: blur(10px) saturate(140%);
+  --chatbox-border-backdrop: blur(14px) saturate(160%);
+  --chatbox-panel-bg: rgba(15, 23, 42, 0.7); /* slate-900/70 */
+  --chatbox-panel-backdrop: blur(22px) saturate(160%);
+}
+
+/* --- Плоский фолбэк, когда стекло выключено --- */
+html.no-glass {
+  --liquid-glass-bg: var(--color-surface-container);
+  --liquid-glass-bg-hover: var(--color-surface-container-high);
+  --liquid-glass-blur: none;
+  --liquid-glass-border: 1px solid var(--color-outline-variant);
+  --liquid-glass-border-hover: 1px solid var(--color-outline);
+  --liquid-glass-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.3);
+  --liquid-glass-sheen-opacity: 0;
+  --message-border-bg: var(--color-outline-variant);
+  --message-border-bg-hover: var(--color-outline);
+  --message-border-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.3);
+  --message-border-shadow-hover: 0 6px 20px -4px rgba(0, 0, 0, 0.4);
+  --message-content-bg: var(--color-surface-container);
+  --message-blur: none;
+  --message-hover-transform: none;
+}
+
+.liquid-glass {
+  position: relative;
+  background: var(--liquid-glass-bg);
+  backdrop-filter: var(--liquid-glass-blur);
+  -webkit-backdrop-filter: var(--liquid-glass-blur);
+  box-shadow: var(--liquid-glass-shadow);
+  border: var(--liquid-glass-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Блик-рамка (mask-composite) */
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--liquid-glass-edge-gradient);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Диагональный "sheen" блик */
+.liquid-glass::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: var(--liquid-glass-sheen-gradient);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  opacity: var(--liquid-glass-sheen-opacity);
+}
+
+/* На плоском фоне оба псевдоэлемента не рендерятся вообще —
+   не просто прозрачные, а полностью убраны из composite */
+html.no-glass .liquid-glass::before,
+html.no-glass .liquid-glass::after {
+  display: none;
+}
+
+.liquid-glass:hover {
+  background: var(--liquid-glass-bg-hover);
+  border: var(--liquid-glass-border-hover);
+}
+
+.liquid-glass.no-hover {
+  --liquid-glass-bg-hover: var(--liquid-glass-bg);
+  --liquid-glass-border-hover: var(--liquid-glass-border);
+}
