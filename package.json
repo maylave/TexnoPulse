@@ -4,7 +4,8 @@
 	"version": "0.0.12",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
+		"dev": "node scripts/dev-ui-and-plugins.mjs",
+		"dev:vite": "vite",
 		"dev:ui": "vite",
 		"dev:server": "npm --prefix server run dev",
 		"dev:plugins": "node --watch plugins-server/src/index.mjs",

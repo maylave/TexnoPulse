@@ -21,40 +21,50 @@ const DEFAULT_CYBERPUNK = {
   id: "cyberpunk-neon",
   name: "Cyberpunk Neon Theme",
   version: "1.0.0",
-  desc: "Футуристическая неоновая киберпанк-тема с глубоким темным фоном, неоновым свечением и стилизованными эффектами чата.",
+  desc: "Футуристическая неоновая киберпанк-тема с глубоким темным фоном, неоновым бирюзовым свечением и стилизованными эффектами чата.",
   author: "Snapi Team",
   icon: "Sparkles",
   categoryId: "visual",
-  downloads: 240,
+  downloads: 245,
   rating: 4.95,
   hasTheme: true,
   createdAt: new Date().toISOString(),
   styles: `
     :root[data-plugin-theme="cyberpunk-neon"],
     body[data-plugin-theme="cyberpunk-neon"] {
-      --sidebar-bg: #070913 !important;
-      --color-surface: #0a0d1a !important;
-      --color-surface-container: #0f1426 !important;
-      --color-surface-container-high: #161c36 !important;
-      --glass-border: rgba(0, 242, 254, 0.25) !important;
+      --sidebar-bg: #070914 !important;
+      --color-background: #050811 !important;
+      --color-surface: #080c1d !important;
+      --color-surface-container: #0c122b !important;
+      --color-surface-container-high: #121c40 !important;
+      --color-surface-container-low: #050813 !important;
+      --color-surface-container-lowest: #020409 !important;
+      --color-accent: #00f2fe !important;
+      --color-accent-hover: #4facfe !important;
       --color-primary: #00f2fe !important;
-      --accent: #00f2fe !important;
-      --neon-glow: 0 0 15px rgba(0, 242, 254, 0.45);
+      --color-on-surface: #e0faff !important;
+      --color-on-surface-variant: #7fe3f5 !important;
+      --color-outline: #00f2fe !important;
+      --color-outline-variant: rgba(0, 242, 254, 0.25) !important;
+      --liquid-glass-bg: linear-gradient(135deg, rgba(8, 12, 29, 0.85) 0%, rgba(12, 18, 43, 0.75) 100%) !important;
+      --liquid-glass-border: 1px solid rgba(0, 242, 254, 0.35) !important;
+      --liquid-glass-shadow: 0 0 25px rgba(0, 242, 254, 0.18), inset 0 0 15px rgba(0, 242, 254, 0.08) !important;
+      --message-content-bg: linear-gradient(135deg, rgba(12, 18, 43, 0.8) 0%, rgba(18, 28, 64, 0.85) 100%) !important;
     }
     [data-plugin-theme="cyberpunk-neon"] .liquid-glass {
-      border-color: rgba(0, 242, 254, 0.2) !important;
-      box-shadow: 0 0 25px rgba(0, 242, 254, 0.08), inset 0 0 15px rgba(79, 172, 254, 0.05) !important;
+      border: 1px solid rgba(0, 242, 254, 0.3) !important;
+      box-shadow: 0 0 30px rgba(0, 242, 254, 0.12), inset 0 0 15px rgba(0, 242, 254, 0.05) !important;
     }
     [data-plugin-theme="cyberpunk-neon"] .glass-modal {
-      border: 1px solid rgba(0, 242, 254, 0.3) !important;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 242, 254, 0.15) !important;
+      border: 1px solid rgba(0, 242, 254, 0.4) !important;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 242, 254, 0.2) !important;
     }
   `,
   code: `
     export default {
       install(context) {
         console.log('[Plugin: Cyberpunk Neon] Активирован успешно!');
-        context.showNotification('Cyberpunk Neon', 'Тема Cyberpunk Neon успешно активирована!');
+        context.showNotification('Cyberpunk Neon', 'Тема Cyberpunk Neon успешно активирована на вашем ПК!');
       },
       uninstall(context) {
         console.log('[Plugin: Cyberpunk Neon] Деактивирован.');
@@ -63,33 +73,49 @@ const DEFAULT_CYBERPUNK = {
   `
 };
 
-// 2. Стартовый плагин: Matrix Rain Effect
+// 2. Стартовый плагин: Matrix Code
 const DEFAULT_MATRIX = {
   id: "matrix-effect",
   name: "Matrix Code Canvas",
   version: "1.1.0",
-  desc: "Цифровой дождь символов в стиле Матрицы в фоне чатов. Высокая производительность и стильная неоновая анимация.",
+  desc: "Зеленая терминальная тема в стиле Матрицы с изумрудным свечением акцентов и контуров.",
   author: "HackerOne",
   icon: "FileCode",
   categoryId: "visual",
-  downloads: 185,
+  downloads: 190,
   rating: 4.8,
   hasTheme: true,
   createdAt: new Date().toISOString(),
   styles: `
-    :root[data-plugin-theme="matrix-effect"] {
-      --accent: #00ff66 !important;
-      --glass-border: rgba(0, 255, 102, 0.2) !important;
+    :root[data-plugin-theme="matrix-effect"],
+    body[data-plugin-theme="matrix-effect"] {
+      --sidebar-bg: #030d06 !important;
+      --color-background: #020703 !important;
+      --color-surface: #041208 !important;
+      --color-surface-container: #061c0d !important;
+      --color-surface-container-high: #0b2e17 !important;
+      --color-surface-container-low: #020904 !important;
+      --color-surface-container-lowest: #010402 !important;
+      --color-accent: #00ff66 !important;
+      --color-accent-hover: #33ff85 !important;
+      --color-primary: #00ff66 !important;
+      --color-on-surface: #dcffe7 !important;
+      --color-on-surface-variant: #66ff99 !important;
+      --color-outline: #00ff66 !important;
+      --color-outline-variant: rgba(0, 255, 102, 0.25) !important;
+      --liquid-glass-bg: linear-gradient(135deg, rgba(4, 18, 8, 0.85) 0%, rgba(6, 28, 13, 0.8) 100%) !important;
+      --liquid-glass-border: 1px solid rgba(0, 255, 102, 0.3) !important;
+      --liquid-glass-shadow: 0 0 25px rgba(0, 255, 102, 0.15) !important;
     }
     [data-plugin-theme="matrix-effect"] .liquid-glass {
-      border-color: rgba(0, 255, 102, 0.25) !important;
-      box-shadow: 0 0 20px rgba(0, 255, 102, 0.1) !important;
+      border: 1px solid rgba(0, 255, 102, 0.3) !important;
+      box-shadow: 0 0 25px rgba(0, 255, 102, 0.15) !important;
     }
   `,
   code: `
     export default {
       install(context) {
-        context.showNotification('Matrix Code', 'Эффект Matrix Code успешно подключен!');
+        context.showNotification('Matrix Code', 'Тема Matrix Code подключена!');
       },
       uninstall(context) {
         console.log('[Plugin: Matrix Code] Отключен');

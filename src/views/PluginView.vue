@@ -150,6 +150,7 @@ const handleToggle = async (pluginId: string, value: boolean) => {
           :key="plugin.id"
           :plugin="plugin"
           :is-installed="pluginStore.isInstalled(plugin.id)"
+          :is-active="pluginStore.isPluginActive(plugin.id)"
           :is-installing="installingId === plugin.id"
           @open-settings="selectedPlugin = $event"
           @install="handleInstall($event)"
@@ -162,6 +163,7 @@ const handleToggle = async (pluginId: string, value: boolean) => {
     <!-- Сайдбар настроек выбранного плагина -->
     <PluginSettingsSidebar 
       :plugin="selectedPlugin"
+      :is-active="selectedPlugin ? pluginStore.isPluginActive(selectedPlugin.id) : false"
       @close="selectedPlugin = null"
       @toggle="selectedPlugin ? handleToggle(selectedPlugin.id, $event) : null"
     />

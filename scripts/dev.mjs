@@ -1,4 +1,4 @@
-import { spawn } from "node:child_process";
+import { spawn, execSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -6,6 +6,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, "..");
 const serverDir = path.join(rootDir, "server");
 const pluginsServerDir = path.join(rootDir, "plugins-server");
+
+// Очистка возможных зависших процессов на портах 4000
+if (process.platform === "win32") {
+  try {
+    execSync('taskkill /F /IM snapi-app.exe 2>nul || exit 0', { stdio: 'ignore' });
+  } catch {}
+}
 
 console.log("\x1b[35m%s\x1b[0m", "========================================================");
 console.log("\x1b[35m%s\x1b[0m", "🚀 Запуск Snapi Ecosystem:");

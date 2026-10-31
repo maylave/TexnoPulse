@@ -29,8 +29,22 @@ export interface InstalledPlugin {
 
 class PluginRuntimeManager {
   private activeStyles = new Map<string, HTMLStyleElement>()
+  private overriddenProperties = new Map<string, string[]>()
   private eventListeners = new Map<string, Set<(...args: any[]) => void>>()
   private activeInstances = new Map<string, { uninstall?: (ctx: PluginContext) => void }>()
+
+  /**
+   * Парсинг CSS переменных из блока стилей плагина
+   */
+  private extractCssVariables(cssText: string): Record<string, string> {
+    const vars: Record<string, string> = {}
+    const regex = /(--[\w-]+)\s*:\s*([^;!]+)(?:!important)?\s*;/g
+    let match
+    while ((match = regex.exec(cssText)) !== null) {
+      vars[match[1].trim()] = match[2].trim()
+    }
+    return vars
+  }
 
   /**
    * Применить CSS стили плагина (тему)
@@ -39,6 +53,7 @@ class PluginRuntimeManager {
     this.removeStyles(pluginId)
     if (!styles || !styles.trim()) return
 
+    // 1. Создаем тег <style> для глобальных CSS правил
     const styleEl = document.createElement('style')
     styleEl.id = `snapi-plugin-theme-${pluginId}`
     styleEl.setAttribute('data-plugin-id', pluginId)
@@ -46,27 +61,58 @@ class PluginRuntimeManager {
     document.head.appendChild(styleEl)
     this.activeStyles.set(pluginId, styleEl)
 
-    // Устанавливаем атрибут темы на корень документа
+    // 2. Устанавливаем data-атрибуты на html и body
     document.documentElement.setAttribute('data-plugin-theme', pluginId)
     document.body.setAttribute('data-plugin-theme', pluginId)
+
+    // 3. Прямая установка CSS-переменных на root для максимального приоритета
+    const vars = this.extractCssVariables(styles)
+    const appliedVars: string[] = []
+
+    for (const [key, val] of Object.entries(vars)) {
+      document.documentElement.style.setProperty(key, val, 'important')
+      appliedVars.push(key)
+    }
+
+    this.overriddenProperties.set(pluginId, appliedVars)
+
+    // 4. Сохраняем активную тему в localStorage
+    try {
+      localStorage.setItem('snapi_active_plugin_theme', pluginId)
+    } catch {}
   }
 
   /**
    * Удалить стили темы плагина
    */
   removeStyles(pluginId: string) {
+    // 1. Удаляем тег <style>
     const existing = this.activeStyles.get(pluginId) || document.getElementById(`snapi-plugin-theme-${pluginId}`)
     if (existing && existing.parentNode) {
       existing.parentNode.removeChild(existing)
     }
     this.activeStyles.delete(pluginId)
 
+    // 2. Удаляем установленные переменные
+    const props = this.overriddenProperties.get(pluginId) || []
+    for (const prop of props) {
+      document.documentElement.style.removeProperty(prop)
+    }
+    this.overriddenProperties.delete(pluginId)
+
+    // 3. Снимаем data-атрибуты
     if (document.documentElement.getAttribute('data-plugin-theme') === pluginId) {
       document.documentElement.removeAttribute('data-plugin-theme')
     }
     if (document.body.getAttribute('data-plugin-theme') === pluginId) {
       document.body.removeAttribute('data-plugin-theme')
     }
+
+    try {
+      if (localStorage.getItem('snapi_active_plugin_theme') === pluginId) {
+        localStorage.removeItem('snapi_active_plugin_theme')
+      }
+    } catch {}
   }
 
   /**
@@ -78,8 +124,7 @@ class PluginRuntimeManager {
       name: plugin.name,
       version: plugin.version,
       showNotification: (title: string, body: string) => {
-        console.log(`[Plugin Notification: ${plugin.name}] ${title}: ${body}`)
-        // Если доступен системный Notification или в приложении
+        console.log(`%c[Plugin: ${plugin.name}] %c${title}: ${body}`, 'color: #38bdf8; font-weight: bold;', 'color: white;')
         if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
           try { new Notification(title, { body }) } catch {}
         }
@@ -87,7 +132,7 @@ class PluginRuntimeManager {
       setThemeVariables: (vars: Record<string, string>) => {
         for (const [key, val] of Object.entries(vars)) {
           const varName = key.startsWith('--') ? key : `--${key}`
-          document.documentElement.style.setProperty(varName, val)
+          document.documentElement.style.setProperty(varName, val, 'important')
         }
       },
       addStyle: (cssText: string) => {
@@ -114,13 +159,13 @@ class PluginRuntimeManager {
   }
 
   /**
-   * Запустить плагин (применить тему и выполнить скрипт)
+   * Запустить плагин (применить тему и исполнить JS код)
    */
   async activate(plugin: InstalledPlugin) {
-    console.log(`[PluginRuntime] Активация плагина: ${plugin.name} (${plugin.id})...`)
+    console.log(`[PluginRuntime] >>> АКТИВАЦИЯ ПЛАГИНА: ${plugin.name} (${plugin.id})`);
 
     // 1. Применяем стили/тему, если есть
-    if (plugin.styles) {
+    if (plugin.styles && plugin.styles.trim()) {
       this.applyStyles(plugin.id, plugin.styles)
     }
 
@@ -130,8 +175,7 @@ class PluginRuntimeManager {
         const context = this.createContext(plugin)
         let pluginModule: any = null
 
-        // Преобразуем код плагина в исполняемый модуль
-        // Поддержка экспорта export default { install, uninstall }
+        // Преобразуем export default в return
         const cleanCode = plugin.code.replace(/export\s+default\s+/, 'return ')
         try {
           const factory = new Function('context', `
@@ -140,7 +184,6 @@ class PluginRuntimeManager {
           `)
           pluginModule = factory(context)
         } catch {
-          // Fallback: выполнение как прямого скрипта
           const directFactory = new Function('context', plugin.code)
           directFactory(context)
         }
@@ -159,7 +202,7 @@ class PluginRuntimeManager {
    * Отключить плагин
    */
   async deactivate(plugin: InstalledPlugin) {
-    console.log(`[PluginRuntime] Деактивация плагина: ${plugin.name} (${plugin.id})...`)
+    console.log(`[PluginRuntime] <<< ДЕАКТИВАЦИЯ ПЛАГИНА: ${plugin.name} (${plugin.id})`);
 
     // 1. Вызываем хук uninstall
     const instance = this.activeInstances.get(plugin.id)

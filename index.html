@@ -4,7 +4,39 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri + Vue + Typescript App</title>
+    <title>Snapi App</title>
+    <!-- Мгновенное восстановление активной темы и стилей плагинов до рендера страницы -->
+    <script>
+      (function() {
+        try {
+          var raw = localStorage.getItem('snapi_installed_plugins');
+          if (raw) {
+            var plugins = JSON.parse(raw);
+            if (Array.isArray(plugins)) {
+              for (var i = 0; i < plugins.length; i++) {
+                var p = plugins[i];
+                if (p && p.isActive && p.styles) {
+                  var style = document.createElement('style');
+                  style.id = 'snapi-plugin-theme-' + p.id;
+                  style.setAttribute('data-plugin-id', p.id);
+                  style.textContent = p.styles;
+                  document.head.appendChild(style);
+                  document.documentElement.setAttribute('data-plugin-theme', p.id);
+                  
+                  var regex = /(--[\w-]+)\s*:\s*([^;!]+)(?:!important)?\s*;/g;
+                  var match;
+                  while ((match = regex.exec(p.styles)) !== null) {
+                    document.documentElement.style.setProperty(match[1].trim(), match[2].trim(), 'important');
+                  }
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('[Snapi Theme Bootloader] Failed to pre-apply theme:', e);
+        }
+      })();
+    </script>
   </head>
 
   <body>

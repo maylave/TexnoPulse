@@ -17,9 +17,8 @@ app.use(pinia)
 
 // 1. Инициализируем тему
 const theme = useThemeStore()
-theme.resetTheme()
 
-// 2. Инициализируем плагины и установленные темы
+// 2. Инициализируем плагины и установленные темы (восстановление активного состояния на ПК)
 const pluginStore = usePluginStore()
 pluginStore.init()
 

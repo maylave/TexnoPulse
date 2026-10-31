@@ -20,6 +20,7 @@ import UiToggle from '@/components/ui/UiToggle.vue'
 const props = defineProps<{
   plugin: any
   isInstalled: boolean
+  isActive: boolean
   isInstalling?: boolean
 }>()
 
@@ -72,12 +73,12 @@ const categoryLabel = computed(() => {
       <!-- Если установлен: переключатель Вкл/Выкл -->
       <div v-if="isInstalled" class="flex items-center gap-1.5">
         <UiToggle 
-          :model-value="plugin.isActive" 
+          :model-value="isActive" 
           @update:model-value="emit('toggle', $event)" 
         />
       </div>
 
-      <!-- Если не установлен: бейджик "Доступен в каталоге" -->
+      <!-- Если не установлен: бейджик "В каталоге" -->
       <div v-else class="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20">
         <Download class="w-3 h-3" />
         <span>Каталог</span>
@@ -111,11 +112,11 @@ const categoryLabel = computed(() => {
 
     <!-- Нижняя панель действий -->
     <div class="relative z-10 pt-3 border-t border-white/10 flex justify-between items-center">
-      <!-- Если установлен -->
+      <!-- Если установлен на ПК -->
       <template v-if="isInstalled">
-        <div class="flex items-center gap-1.5 text-[11px] font-medium" :class="plugin.isActive ? 'text-emerald-400' : 'text-slate-400'">
+        <div class="flex items-center gap-1.5 text-[11px] font-medium" :class="isActive ? 'text-emerald-400' : 'text-slate-400'">
           <CheckCircle2 class="w-3.5 h-3.5" />
-          <span>{{ plugin.isActive ? 'Активен на ПК' : 'Отключен' }}</span>
+          <span>{{ isActive ? 'Включен на ПК' : 'Отключен' }}</span>
         </div>
 
         <div class="flex items-center gap-1">
