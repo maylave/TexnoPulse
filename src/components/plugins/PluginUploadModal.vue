@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { X, Upload, Sparkles, Code2, Palette, FileText, CheckCircle2, AlertCircle } from 'lucide-vue-next'
-import { usePluginStore } from '@/stores/plugins'
+// import { usePluginStore } from '@/stores/plugins' // Закомментировано
 
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'published', plugin: any): void
 }>()
 
-const pluginStore = usePluginStore()
+// const pluginStore = usePluginStore() // Закомментировано
 
 // Режим: 'form' (визуальный редактор) или 'file' (загрузка файла manifest.json)
 const activeTab = ref<'form' | 'file'>('form')
@@ -79,7 +79,7 @@ const submitPlugin = async () => {
 
   isPublishing.value = true
   try {
-    const res = await pluginStore.uploadPlugin({
+    const payload = {
       id: id.value.trim().toLowerCase(),
       name: name.value.trim(),
       author: author.value.trim() || 'Сторонний автор',
@@ -90,7 +90,11 @@ const submitPlugin = async () => {
       hasTheme: styles.value.trim().length > 0,
       styles: styles.value,
       code: code.value
-    })
+    }
+
+    // Эмуляция сетевого запроса к серверу (вместо pluginStore.uploadPlugin)
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    const res = { plugin: payload }
 
     successMsg.value = 'Плагин успешно опубликован на сервер!'
     emit('published', res?.plugin)

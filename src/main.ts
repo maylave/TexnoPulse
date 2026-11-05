@@ -4,7 +4,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { useThemeStore } from '@/stores/theme'
 import { useMessagesStore } from '@/stores/messages'
-import { usePluginStore } from '@/stores/plugins'
+
 import App from './App.vue'
 import router from './router'
 import { api } from '@/api/client'
@@ -18,16 +18,12 @@ app.use(pinia)
 // 1. Инициализируем тему
 const theme = useThemeStore()
 
-// 2. Инициализируем плагины и установленные темы (восстановление активного состояния на ПК)
-const pluginStore = usePluginStore()
-pluginStore.init()
-
 // 3. Инициализируем слушатели сокета и запускаем подключение
 const messagesStore = useMessagesStore()
 messagesStore.init()
 
 if (typeof (api as any).connect === 'function') {
-  ;(api as any).connect()
+	;(api as any).connect()
 }
 registerModals()
 app.use(router)

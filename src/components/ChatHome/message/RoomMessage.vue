@@ -4,7 +4,6 @@ import { computed } from "vue";
 import type { Message, BlockHighlight } from "@/types/message";
 import { useChatSettingsStore } from "@/stores/chatSettings";
 import { blockConfig } from "@/config/messageBlocks";
-import { pluginBlockRegistry } from "@/services/plugins/sdk/BlockRegistry";
 
 const props = defineProps<{
   message: Message;
@@ -33,7 +32,7 @@ const colorClasses = computed(() => {
 });
 
 const getBlockConfig = (type: string) =>
-  pluginBlockRegistry.get(type) || blockConfig[type as keyof typeof blockConfig] || blockConfig.text;
+  blockConfig[type as keyof typeof blockConfig] || blockConfig.text;
 
 const highlightMap: Record<BlockHighlight, string> = {
   none: "",

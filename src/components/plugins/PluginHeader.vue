@@ -19,7 +19,7 @@ const emit = defineEmits<{
 
 <template>
   <header class="flex flex-col gap-6 mb-6">
-    <!-- Верхняя строка: Кнопка назад, заголовок, поиск и кнопка загрузки -->
+   
     <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
       <div class="flex flex-col gap-2">
         <button 
@@ -31,15 +31,7 @@ const emit = defineEmits<{
         </button>
 
         <div>
-          <div class="flex items-center gap-3">
-            <h1 class="text-2xl font-bold tracking-tight text-white">Каталог плагинов и тем</h1>
-            <span class="px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-sky-500/20 text-sky-400 border border-sky-500/30">
-              Snapi Store
-            </span>
-          </div>
-          <p class="text-slate-400 text-xs mt-0.5">
-            Установка сторонних расширений с сервера и кастомизация оформления
-          </p>
+          
         </div>
       </div>
       
@@ -55,15 +47,7 @@ const emit = defineEmits<{
           />
         </div>
 
-        <button
-          type="button"
-          @click="emit('open-upload')"
-          class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white text-xs font-medium shadow-md shadow-purple-500/20 transition-all hover:scale-102 active:scale-95 shrink-0 cursor-pointer"
-          title="Загрузить свой плагин на сервер"
-        >
-          <Plus class="w-4 h-4" />
-          <span>Загрузить плагин</span>
-        </button>
+      
       </div>
     </div>
 
@@ -77,7 +61,7 @@ const emit = defineEmits<{
           :class="activeTab === 'market' ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
         >
           <Globe class="w-3.5 h-3.5" />
-          <span>Каталог на сервере</span>
+          <span>Каталог</span>
           <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">{{ serverCount }}</span>
         </button>
 
@@ -88,7 +72,7 @@ const emit = defineEmits<{
           :class="activeTab === 'installed' ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-400 hover:text-white'"
         >
           <HardDrive class="w-3.5 h-3.5" />
-          <span>Установленные на ПК</span>
+          <span>Установленные</span>
           <span class="px-1.5 py-0.2 rounded-full text-[10px] bg-white/20">{{ installedCount }}</span>
         </button>
       </div>

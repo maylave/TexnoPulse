@@ -3,9 +3,14 @@ import { onMounted, onUnmounted } from 'vue'
 import { useSettingsStore } from '@/stores/settings'
 import { useMessagesStore } from '@/stores/messages'
 import { useModalStore } from '@/stores/appModal'
-import { DEFAULT_HOTKEYS } from '@/config/hotkeys'
-import type { HotkeyAction, KeyBindingValue } from '@/types/hotkeys'
-
+import { globalHotkeyRegistry } from '@/services/plugins/HotkeyRegistry'
+interface KeyBindingValue {
+	key: string
+	ctrl?: boolean
+	shift?: boolean
+	alt?: boolean
+	meta?: boolean
+}
 const SPECIAL_KEY_CODES: Record<string, string> = {
 	arrowup: 'ArrowUp',
 	arrowdown: 'ArrowDown',
@@ -16,10 +21,9 @@ const SPECIAL_KEY_CODES: Record<string, string> = {
 	space: 'Space'
 }
 
-// Глобальный флаг, чтобы слушатель никогда не вешался дважды,
-// даже если useGlobalHotkeys() вызвали в нескольких компонентах
 let activeListenersCount = 0
 let globalKeydownHandler: ((e: KeyboardEvent) => void) | null = null
+let nativeHotkeysRegistered = false
 
 const isKeyMatch = (e: KeyboardEvent, targetKey: string): boolean => {
 	if (!targetKey) return false
@@ -37,37 +41,65 @@ const isKeyMatch = (e: KeyboardEvent, targetKey: string): boolean => {
 	return false
 }
 
+// 🌟 Регистрация базовых хоткеев ядра
+const registerNativeHotkeys = () => {
+	if (nativeHotkeysRegistered) return
+
+	const modal = useModalStore()
+	const messagesStore = useMessagesStore()
+
+	globalHotkeyRegistry.register({
+		action: 'toggle_settings',
+		label: 'Открыть настройки',
+		key: ',',
+		ctrl: true,
+		callback: () => modal.toggle('settings')
+	})
+
+	globalHotkeyRegistry.register({
+		action: 'toggle_editor',
+		label: 'Открыть / скрыть редактор заметок',
+		key: 'e',
+		alt: true,
+		callback: () => modal.toggle('Editor')
+	})
+
+	globalHotkeyRegistry.register({
+		action: 'close_modal',
+		label: 'Закрыть модальное окно',
+		key: 'Escape',
+		callback: () => {
+			modal.close()
+			messagesStore.isEditorOpen = false
+		}
+	})
+
+	globalHotkeyRegistry.register({
+		action: 'toggle_search',
+		label: 'Глобальный поиск',
+		key: 'f',
+		shift: true,
+		callback: () => modal.toggle('global-search')
+	})
+
+	nativeHotkeysRegistered = true
+}
+
 export function useGlobalHotkeys() {
 	const settingsStore = useSettingsStore()
-	const messagesStore = useMessagesStore()
-	const modal = useModalStore()
 
-	const executeAction = (action: HotkeyAction) => {
-		console.log('[Hotkeys] Сработало действие:', action)
+	// Регистрация нативных хоткеев при первом вызове композабла
+	registerNativeHotkeys()
 
-		switch (action) {
-			case 'toggle_settings':
-				modal.toggle('settings')
-				break
-
-			case 'toggle_editor':
-				modal.toggle('Editor')
-				break
-
-			case 'close_modal':
-				modal.close()
-				messagesStore.isEditorOpen = false
-				break
-			case 'toggle_search':
-				modal.toggle('global-search')
-				break
-		}
-	}
-
-	const getBindingFor = (
-		def: (typeof DEFAULT_HOTKEYS)[number]
-	): KeyBindingValue => {
+	const getBindingFor = (def: {
+		action: string
+		key: string
+		ctrl?: boolean
+		shift?: boolean
+		alt?: boolean
+	}): KeyBindingValue => {
 		const storeValues = (settingsStore.values ?? {}) as Record<string, unknown>
+		// Проверяем кастомную настройку пользователя из store
 		const rawFromValues =
 			storeValues[`hk_${def.action}`] ?? storeValues[def.action]
 
@@ -81,17 +113,18 @@ export function useGlobalHotkeys() {
 
 		return {
 			key: def.key,
-			ctrl: def.ctrl,
-			shift: def.shift,
-			alt: def.alt
+			ctrl: !!def.ctrl,
+			shift: !!def.shift,
+			alt: !!def.alt
 		}
 	}
 
 	const handleKeydown = (e: KeyboardEvent) => {
-		// Игнорируем одиночные нажатия самих клавиш-модификаторов
 		if (['Control', 'Shift', 'Alt', 'Meta'].includes(e.key)) return
 
-		for (const def of DEFAULT_HOTKEYS) {
+		const allHotkeys = globalHotkeyRegistry.getAll()
+
+		for (const def of allHotkeys) {
 			const binding = getBindingFor(def)
 
 			const matchKey = isKeyMatch(e, binding.key)
@@ -102,24 +135,27 @@ export function useGlobalHotkeys() {
 			if (matchKey && matchCtrl && matchShift && matchAlt) {
 				e.preventDefault()
 				e.stopPropagation()
-				executeAction(def.action)
+				console.log(`[Hotkeys] Сработало действие: ${def.action}`)
+				def.callback() // 🌟 Вызов динамического коллбэка
 				return
 			}
 		}
 
-		// Дополнительный встроенный шорткат: Ctrl + Shift + E тоже всегда открывает редактор
+		// Дополнительные жесткие системные шорткаты можно оставить тут, если они не должны переназначаться
 		if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === 'KeyE') {
 			e.preventDefault()
 			e.stopPropagation()
-			executeAction('toggle_editor')
+			globalHotkeyRegistry.get('toggle_editor')?.callback()
 			return
 		}
 
-		// Дополнительный встроенный шорткат: Ctrl + K / Cmd + K всегда открывает глобальный поиск
-		if ((e.ctrlKey || e.metaKey) && (e.code === 'KeyK' || e.key.toLowerCase() === 'k')) {
+		if (
+			(e.ctrlKey || e.metaKey) &&
+			(e.code === 'KeyK' || e.key.toLowerCase() === 'k')
+		) {
 			e.preventDefault()
 			e.stopPropagation()
-			executeAction('toggle_search')
+			globalHotkeyRegistry.get('toggle_search')?.callback()
 			return
 		}
 	}

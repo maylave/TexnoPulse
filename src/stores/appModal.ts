@@ -4,10 +4,8 @@ import { defineStore } from 'pinia'
 import type { ModalDefinition, ModalId } from '@/types/modal'
 
 export const useModalStore = defineStore('modal', () => {
-	// Реестр: компоненты не должны быть реактивными, поэтому shallowRef + markRaw
 	const registry = shallowRef<Record<ModalId, ModalDefinition>>({})
 
-	// Активная модалка и данные для неё
 	const activeId = ref<ModalId | null>(null)
 	const payload = ref<unknown>(null)
 
@@ -15,8 +13,13 @@ export const useModalStore = defineStore('modal', () => {
 		activeId.value ? (registry.value[activeId.value] ?? null) : null
 	)
 
+	const registeredModalIds = computed(
+		() => Object.keys(registry.value) as ModalId[]
+	)
+
+	// 🌟 Добавляем/переименовываем метод hasModal
+	const hasModal = (id: ModalId) => id in registry.value
 	const isOpen = (id: ModalId) => activeId.value === id
-	const isRegistered = (id: ModalId) => id in registry.value
 
 	function register(def: ModalDefinition) {
 		registry.value = {
@@ -36,9 +39,8 @@ export const useModalStore = defineStore('modal', () => {
 		registry.value = rest
 	}
 
-	// Открыть модалку: предыдущая активная заменяется
 	function open<T = unknown>(id: ModalId, data?: T) {
-		if (!isRegistered(id)) {
+		if (!hasModal(id)) {
 			console.warn(`[modal] "${id}" не зарегистрирована`)
 			return
 		}
@@ -62,8 +64,9 @@ export const useModalStore = defineStore('modal', () => {
 		activeId,
 		active,
 		payload,
+		registeredModalIds,
+		hasModal, // 🌟 Экспортируем
 		isOpen,
-		isRegistered,
 		register,
 		unregister,
 		open,
